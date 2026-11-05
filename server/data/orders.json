@@ -1,0 +1,22 @@
+[
+  {
+    "restaurantId": "rest-1",
+    "restaurantSlug": "lumbre-alta-cocina",
+    "customerName": "Ana Torres",
+    "customerPhone": "525598765432",
+    "orderType": "pickup",
+    "items": [
+      {
+        "productName": "Pato Laqueado",
+        "quantity": 1,
+        "subtotal": 520
+      }
+    ],
+    "subtotal": 520,
+    "deliveryFee": 0,
+    "total": 520,
+    "paymentMethod": "whatsapp",
+    "paymentStatus": "pendiente",
+    "orderStatus": "recibido"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "name": "LAV Restaurantes — Tarjetas Digitales Inteligentes",
+  "description": "Plataforma profesional para crear, personalizar y administrar tarjetas digitales interactivas para restaurantes, bares y negocios gastronómicos con menú digital, pedidos WhatsApp, Mercado Pago y 20 plantillas de autor.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

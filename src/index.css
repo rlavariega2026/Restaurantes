@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .font-jakarta {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  .font-playfair {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+  .font-outfit {
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  .font-cormorant {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+  }
+  .font-fraunces {
+    font-family: 'Fraunces', Georgia, serif;
+  }
+  .font-oswald {
+    font-family: 'Oswald', sans-serif;
+  }
+  .font-dmsans {
+    font-family: 'DM Sans', sans-serif;
+  }
+  .font-mono-code {
+    font-family: 'Space Mono', monospace;
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+}
