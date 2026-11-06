@@ -92,7 +92,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const HOSTINGER_FOLDER = 'public_html/Restaurantes/';
   const HOSTINGER_DOMAIN = 'lavdigitalagency.com';
   const [hostingerFolderName, setHostingerFolderName] = useState(HOSTINGER_FOLDER);
-  const [hostingerDomainName, setHostingerDomainName] = useState(HOSTINGER_DOMAIN);
   const [isPublishingHostinger, setIsPublishingHostinger] = useState(false);
   const [hostingerPublishSuccess, setHostingerPublishSuccess] = useState(false);
   const [hostingerPublishedUrl, setHostingerPublishedUrl] = useState('');
@@ -300,7 +299,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setHostingerCardName(form.name);
     setHostingerTemplateName(form.branding?.customTemplateName || activeTemplate?.name || 'Plantilla Personalizada');
     setHostingerFolderName(HOSTINGER_FOLDER);
-    setHostingerDomainName(HOSTINGER_DOMAIN);
     setIsHostingerExportModalOpen(true);
     setHostingerPublishSuccess(false);
   };
