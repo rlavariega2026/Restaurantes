@@ -76,7 +76,7 @@ export default function App() {
   const navigateTo = (newView: 'landing' | 'admin' | 'card', slug?: string) => {
     setView(newView);
     if (slug) {
-      const rest = restaurants.find((r) => r.slug === slug);
+      const rest = restaurants.find((r) => r.slug === slug || r.hostingerConfig?.publicationSlug === slug);
       if (rest) {
         setCurrentRestaurant(rest);
         RestaurantService.setActiveSlug(rest.slug);
