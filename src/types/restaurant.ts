@@ -187,6 +187,7 @@ export interface Restaurant {
     customDomain?: string;
     publishedAt?: string;
     liveUrl?: string;
+    publicationSlug?: string;
   };
   createdAt: string;
   updatedAt: string;
