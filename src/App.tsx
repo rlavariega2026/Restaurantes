@@ -39,20 +39,28 @@ export default function App() {
     RestaurantService.getRestaurants().then((data) => {
       setRestaurants(data);
       
-      // Check if URL has a restaurant slug: /restaurantes/:slug or /:slug
-      const path = window.location.pathname;
-      const match = path.match(/\/(?:restaurantes\/)?([a-zA-Z0-9_-]+)/);
-      const requestedSlug = match ? match[1] : null;
+      // All application routes stay inside the fixed Hostinger directory.
+      const relativePath = window.location.pathname
+        .replace(/^\/Restaurantes\/?/i, '')
+        .replace(/^\/+|\/+$/g, '');
+      const segments = relativePath.split('/').filter(Boolean);
 
-      if (requestedSlug) {
-        const found = data.find((r) => r.slug === requestedSlug);
-        if (found) {
-          setCurrentRestaurant(found);
-          setView('card');
-          setLoading(false);
-          // Record view event
-          RestaurantService.recordEvent(found.slug, 'views');
-          return;
+      if (segments[0]?.toLowerCase() === 'admin') {
+        setView('admin');
+      } else {
+        const requestedSlug = segments[0]?.toLowerCase() === 'restaurantes' ? segments[1] : segments[0];
+        if (requestedSlug) {
+          const found = data.find((r) =>
+            r.slug === requestedSlug ||
+            r.hostingerConfig?.publicationSlug === requestedSlug
+          );
+          if (found) {
+            setCurrentRestaurant(found);
+            setView('card');
+            setLoading(false);
+            RestaurantService.recordEvent(found.slug, 'views');
+            return;
+          }
         }
       }
 
@@ -74,14 +82,17 @@ export default function App() {
         RestaurantService.setActiveSlug(rest.slug);
       }
     }
-    // Update window history
+    // Keep every screen and published card inside the fixed Hostinger app directory.
+    const appBase = '/Restaurantes';
     if (newView === 'card' && slug) {
-      window.history.pushState({}, '', `/restaurantes/${slug}/`);
-      RestaurantService.recordEvent(slug, 'views');
+      const rest = restaurants.find((r) => r.slug === slug || r.hostingerConfig?.publicationSlug === slug);
+      const publicSlug = rest?.hostingerConfig?.publicationSlug || rest?.slug || slug;
+      window.history.pushState({}, '', `${appBase}/${publicSlug}/`);
+      if (rest) RestaurantService.recordEvent(rest.slug, 'views');
     } else if (newView === 'admin') {
-      window.history.pushState({}, '', '/admin');
+      window.history.pushState({}, '', `${appBase}/admin/`);
     } else {
-      window.history.pushState({}, '', '/');
+      window.history.pushState({}, '', `${appBase}/`);
     }
   };
 
@@ -232,7 +243,7 @@ export default function App() {
           onUpdateRestaurant={(updated) => {
             setCurrentRestaurant(updated);
             setRestaurants((prev) =>
-              prev.map((r) => (r.slug === updated.slug ? updated : r))
+              prev.map((r) => (r.id === updated.id ? updated : r))
             );
           }}
           onRefreshList={async () => {
