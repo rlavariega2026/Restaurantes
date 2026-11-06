@@ -1,4 +1,5 @@
 name: Deploy Restaurantes to Hostinger
+# FTP deployment is restricted to /public_html/Restaurantes/.
 
 on:
   push:
