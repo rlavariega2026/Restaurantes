@@ -89,8 +89,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [isHostingerExportModalOpen, setIsHostingerExportModalOpen] = useState(false);
   const [hostingerCardName, setHostingerCardName] = useState('');
   const [hostingerTemplateName, setHostingerTemplateName] = useState('');
-  const [hostingerFolderName, setHostingerFolderName] = useState('');
-  const [hostingerDomainName, setHostingerDomainName] = useState('tudominio.com');
+  const HOSTINGER_FOLDER = 'public_html/Restaurantes/';
+  const HOSTINGER_DOMAIN = 'lavdigitalagency.com';
+  const [hostingerFolderName, setHostingerFolderName] = useState(HOSTINGER_FOLDER);
+  const [hostingerDomainName, setHostingerDomainName] = useState(HOSTINGER_DOMAIN);
   const [isPublishingHostinger, setIsPublishingHostinger] = useState(false);
   const [hostingerPublishSuccess, setHostingerPublishSuccess] = useState(false);
   const [hostingerPublishedUrl, setHostingerPublishedUrl] = useState('');
@@ -297,8 +299,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     const activeTemplate = TEMPLATE_DEFINITIONS.find((t) => t.id === form.templateId);
     setHostingerCardName(form.name);
     setHostingerTemplateName(form.branding?.customTemplateName || activeTemplate?.name || 'Plantilla Personalizada');
-    setHostingerFolderName(form.hostingerConfig?.folder || `public_html/${form.slug}`);
-    setHostingerDomainName(form.hostingerConfig?.customDomain || 'tudominio.com');
+    setHostingerFolderName(HOSTINGER_FOLDER);
+    setHostingerDomainName(HOSTINGER_DOMAIN);
     setIsHostingerExportModalOpen(true);
     setHostingerPublishSuccess(false);
   };
@@ -309,11 +311,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     try {
       const assignedCardName = hostingerCardName.trim() || form.name;
       const assignedTemplateName = hostingerTemplateName.trim() || form.branding?.customTemplateName || 'Plantilla Personalizada';
-      const targetDomain = hostingerDomainName.trim() || 'tudominio.com';
-      const cleanFolder = hostingerFolderName.trim().replace(/^\/+|\/+$/g, '');
-      const liveUrl = cleanFolder === 'public_html' || !cleanFolder
-        ? `https://${targetDomain}/`
-        : `https://${targetDomain}/${cleanFolder.replace(/^public_html\/?/, '')}/`;
+      const targetDomain = HOSTINGER_DOMAIN;
+      const publicationSlug = `${assignedCardName}-${assignedTemplateName}`
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '') || form.slug;
+      const liveUrl = `https://${HOSTINGER_DOMAIN}/Restaurantes/${publicationSlug}/`;
 
       const updated: Restaurant = {
         ...form,
@@ -324,8 +329,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         },
         hostingerConfig: {
           published: true,
-          folder: hostingerFolderName.trim() || `public_html/${form.slug}`,
-          customDomain: targetDomain,
+          folder: HOSTINGER_FOLDER,
+          customDomain: HOSTINGER_DOMAIN,
+          publicationSlug,
           publishedAt: new Date().toISOString(),
           liveUrl,
         },
@@ -2703,7 +2709,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <span>Copiar Enlace</span>
                     </button>
                     <button
-                      onClick={() => onViewPublicCard(form.slug)}
+                      onClick={() => onViewPublicCard(form.hostingerConfig?.publicationSlug || form.slug)}
                       className="flex-1 py-2 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5"
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -2754,13 +2760,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </label>
                     <input
                       type="text"
-                      value={hostingerFolderName}
-                      onChange={(e) => setHostingerFolderName(e.target.value)}
-                      placeholder="public_html/origen-cafe-especialidad"
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg font-mono text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      value="public_html/Restaurantes/"
+                      readOnly
+                      aria-readonly="true"
+                      className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg font-mono text-xs font-bold text-slate-700 cursor-not-allowed"
                     />
                     <span className="text-[10px] text-slate-500 mt-0.5 block">
-                      Usa public_html para que abra directo en la raíz de tu dominio, o public_html/{form.slug} para subcarpeta.
+                      Directorio fijo de instalación. No se modifica al publicar cada restaurante.
                     </span>
                   </div>
 
@@ -2771,23 +2777,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </label>
                     <input
                       type="text"
-                      value={hostingerDomainName}
-                      onChange={(e) => setHostingerDomainName(e.target.value)}
-                      placeholder="tudominio.com o lavdigitalmkt.com"
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg font-mono text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      value="lavdigitalagency.com"
+                      readOnly
+                      aria-readonly="true"
+                      className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg font-mono text-xs font-bold text-slate-700 cursor-not-allowed"
                     />
                     <span className="text-[10px] text-slate-500 mt-0.5 block">
-                      Ingresa tu dominio para generar la URL exacta de acceso.
+                      Dominio fijo de publicación.
                     </span>
                   </div>
 
                   {/* Live URL Preview */}
                   {(() => {
-                    const targetDomain = hostingerDomainName.trim() || 'tudominio.com';
-                    const cleanFolder = hostingerFolderName.trim().replace(/^\/+|\/+$/g, '');
-                    const liveUrl = cleanFolder === 'public_html' || !cleanFolder
-                      ? `https://${targetDomain}/`
-                      : `https://${targetDomain}/${cleanFolder.replace(/^public_html\/?/, '')}/`;
+                    const fileSlug = `${hostingerCardName || form.name}-${hostingerTemplateName || 'plantilla'}`
+                      .toLowerCase()
+                      .normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                      .replace(/[^a-z0-9]+/g, '-')
+                      .replace(/(^-|-$)+/g, '') || form.slug;
+                    const liveUrl = `https://lavdigitalagency.com/Restaurantes/${fileSlug}/`;
                     return (
                       <div className="p-3 bg-indigo-50/70 border border-indigo-200 rounded-xl space-y-1">
                         <div className="flex items-center justify-between">
