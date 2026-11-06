@@ -46,5 +46,5 @@ jobs:
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp
           local-dir: ./dist/
-          server-dir: /public_html/Restaurantes/
+          server-dir: /domains/lavdigitalagency.com/public_html/Restaurantes/
           dangerous-clean-slate: false
