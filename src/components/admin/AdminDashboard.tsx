@@ -193,6 +193,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setTimeout(() => setMpFeedback(null), 5000);
   };
 
+  const handleTestMercadoPagoConnection = async () => {
+    try {
+      const saved = await RestaurantService.saveRestaurant(form);
+      setForm(saved);
+      onUpdateRestaurant(saved);
+      const response = await fetch('/api/mercadopago/create-preference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: 'Prueba de conexión · ' + saved.name,
+          price: 10,
+          quantity: 1,
+          currency_id: saved.mercadoPagoConfig.currency || 'MXN',
+          external_reference: 'TEST-' + Date.now(),
+          restaurant_slug: saved.slug,
+          sandbox_mode: saved.mercadoPagoConfig.sandboxMode,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Mercado Pago no aceptó las credenciales.');
+      const checkoutUrl = saved.mercadoPagoConfig.sandboxMode
+        ? (result.sandbox_init_point || result.init_point)
+        : result.init_point;
+      if (!checkoutUrl) throw new Error('Mercado Pago no devolvió un enlace de Checkout Pro.');
+      window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'No se pudo comprobar la conexión con Mercado Pago.');
+    }
+  };
+
   // Open Save Modal (either update existing or create as new card)
   const handleOpenSaveModal = (actionType: 'update' | 'create_new' = 'update') => {
     setSaveActionType(actionType);
@@ -1828,14 +1858,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                     <button
                       type="button"
-                      onClick={() => {
-                        setMpSimStep('method');
-                        setIsMpSimulatorOpen(true);
-                      }}
+                      onClick={handleTestMercadoPagoConnection}
                       className="py-1.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 transition-colors"
                     >
                       <Play className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Probar Simulación de Cobro en Vivo</span>
+                      <span>Probar conexión con Mercado Pago</span>
                     </button>
                   </div>
 
@@ -2026,12 +2053,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <input
                       type="text"
                       readOnly
-                      value={`${window.location.origin}/restaurantes/${form.slug}/`}
+                      value={`${window.location.origin}/Restaurantes/${form.slug}/`}
                       className="w-full text-xs font-mono px-3 py-2 bg-white border border-slate-200 rounded-lg"
                     />
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText(`${window.location.origin}/restaurantes/${form.slug}/`);
+                        navigator.clipboard.writeText(`${window.location.origin}/Restaurantes/${form.slug}/`);
                         alert('¡Enlace copiado al portapapeles!');
                       }}
                       className="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg shrink-0"
@@ -2581,7 +2608,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div className="mt-1 p-2 bg-slate-100 rounded-lg text-[10px] text-slate-600 font-mono break-all">
                   <span className="font-semibold text-slate-500">URL pública resultante: </span>
                   <span className="text-amber-800 font-bold">
-                    {window.location.origin}/restaurantes/{saveSlug || 'tu-restaurante'}/
+                    {window.location.origin}/Restaurantes/{saveSlug || 'tu-restaurante'}/
                   </span>
                 </div>
               </div>
