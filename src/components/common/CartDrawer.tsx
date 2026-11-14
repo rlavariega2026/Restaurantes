@@ -405,6 +405,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
               {/* Action Buttons */}
               <div className="space-y-2 pt-1">
+                {restaurant.ordering?.enabled !== false && restaurant.ordering?.destination === 'custom_url' ? (
+                  <button type="button" onClick={handleCustomDestination} className="w-full py-3 px-4 rounded-full font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[.98]" style={{backgroundColor:restaurant.branding.accentColor,color:'#111827'}}>
+                    <ExternalLink className="w-4 h-4" /><span>Continuar al sitio del restaurante</span><ArrowRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                <>
                 {/* 1. Pedir por WhatsApp */}
                 {restaurant.features.whatsappOrders && (<button
                   type="button"
@@ -439,6 +445,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     <CreditCard className="w-4 h-4" />
                     <span>Pagar en línea con Mercado Pago</span>
                   </button>
+                )}
+                </>
                 )}
               </div>
 
