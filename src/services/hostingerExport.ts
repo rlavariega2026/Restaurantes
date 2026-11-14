@@ -45,6 +45,12 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
     .font-oswald { font-family: 'Oswald', sans-serif; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .hero-action,.action-pill,.social-pill{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:10px 15px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.01em;border:1px solid ${branding.textColor}25;background:rgba(15,23,42,.62);color:#fff;backdrop-filter:blur(12px);box-shadow:0 6px 18px rgba(0,0,0,.12);transition:transform .18s,background .18s}
+    .hero-action-primary{background:${buttonBackground};color:${buttonTextColor};border-color:${buttonBorder}}
+    .action-pill{background:${branding.bgColor}18;color:${branding.textColor};border-color:${branding.textColor}30;box-shadow:none}
+    .social-pill{background:${branding.bgColor}18;color:${branding.textColor};border-color:${branding.textColor}25;box-shadow:none}
+    .hero-action:active,.action-pill:active,.social-pill:active{transform:scale(.97)}
+    @media(max-width:380px){.action-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.action-pill{font-size:11px;padding:9px 10px}}
     .product-card{background:${branding.surfaceColor};box-shadow:0 12px 30px rgba(0,0,0,.12);border-radius:22px!important}
     .product-card h3{font-size:15px;line-height:1.35;font-weight:800}
     .product-card button{border-radius:999px;font-weight:800}
@@ -79,6 +85,11 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
       <div class="absolute bottom-5 inset-x-5 text-white z-10 space-y-1">
         <h1 class="text-3xl font-black leading-tight tracking-tight">${restaurant.name}</h1>
         <p class="text-xs text-white/90 font-medium line-clamp-2">${restaurant.tagline || ''}</p>
+        <div class="flex flex-wrap gap-2 pt-3">
+          <a href="#menu-section" class="hero-action">Ver menú</a>
+          ${orderingEnabled ? '<button type="button" onclick="openCart()" class="hero-action hero-action-primary">Pedir ahora</button>' : ''}
+          ${features.tableReservations && contact.whatsapp ? '<a href="https://wa.me/' + contact.whatsapp.replace(/\D/g, '') + '?text=' + encodeURIComponent('Hola ' + restaurant.name + ', quisiera reservar una mesa.') + '" target="_blank" rel="noopener" class="hero-action">Reservar</a>' : ''}
+        </div>
       </div>
     </header>
 
@@ -86,17 +97,19 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
     <section class="p-4 border-b space-y-3" style="background-color: ${branding.surfaceColor}; border-color: ${branding.textColor}1A;">
       <p class="text-xs opacity-85 leading-relaxed">${restaurant.description || ''}</p>
 
-      <div class="grid grid-cols-3 gap-2 text-xs font-bold pt-1">
-        <a href="https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent('Hola ' + restaurant.name + ', te contacto desde tu tarjeta digital.')}" target="_blank" class="py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-sm text-white" style="background-color: ${branding.accentColor};">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-bold pt-1 action-grid">
+        <a href="https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent('Hola ' + restaurant.name + ', te contacto desde tu tarjeta digital.')}" target="_blank" class="action-pill py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-sm text-white" style="background-color: ${branding.accentColor};">
           <span>WhatsApp</span>
         </a>
-        <a href="tel:${contact.phone.replace(/\s+/g, '')}" class="py-2.5 px-3 rounded-xl border flex items-center justify-center gap-1.5" style="border-color: ${branding.textColor}30; color: ${branding.textColor};">
+        <a href="tel:${contact.phone.replace(/\s+/g, '')}" class="action-pill py-2.5 px-3 rounded-xl border flex items-center justify-center gap-1.5" style="border-color: ${branding.textColor}30; color: ${branding.textColor};">
           <span>Llamar</span>
         </a>
         <a href="${contact.googleMapsUrl || 'https://maps.google.com/?q=' + encodeURIComponent(contact.address)}" target="_blank" class="py-2.5 px-3 rounded-xl border flex items-center justify-center gap-1.5" style="border-color: ${branding.textColor}30; color: ${branding.textColor};">
           <span>Ubicación</span>
         </a>
       </div>
+
+      <button type="button" onclick="downloadContact()" class="action-pill py-2.5 px-3 rounded-xl border flex items-center justify-center gap-1.5" style="border-color: ${branding.textColor}30; color: ${branding.textColor};"><span>Guardar contacto</span></button>
 
       <!-- HORARIOS DESPLEGABLES -->
       <div class="pt-2">
@@ -188,7 +201,7 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
     ` : ''}
 
     <!-- MENU DIGITAL INTERACTIVO -->
-    <main class="px-4 py-4 space-y-4 flex-1">
+    <main id="menu-section" class="px-4 py-4 space-y-4 flex-1">
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-xl font-black tracking-tight">Menú Digital</h2>
@@ -232,6 +245,13 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
     <!-- FOOTER -->
     <footer class="p-6 border-t text-center space-y-2 text-xs" style="background-color: ${branding.surfaceColor}; border-color: ${branding.textColor}15;">
       <p class="font-bold text-sm">${restaurant.name}</p>
+      <div class="flex flex-wrap justify-center gap-2 py-2">
+        ${socialLinks.instagram ? '<a class="social-pill" href="' + (socialLinks.instagram.startsWith('http') ? socialLinks.instagram : 'https://instagram.com/' + socialLinks.instagram.replace(/^@/,'')) + '" target="_blank" rel="noopener">Instagram</a>' : ''}
+        ${socialLinks.facebook ? '<a class="social-pill" href="' + (socialLinks.facebook.startsWith('http') ? socialLinks.facebook : 'https://facebook.com/' + socialLinks.facebook.replace(/^@/,'')) + '" target="_blank" rel="noopener">Facebook</a>' : ''}
+        ${socialLinks.tiktok ? '<a class="social-pill" href="' + (socialLinks.tiktok.startsWith('http') ? socialLinks.tiktok : 'https://tiktok.com/@' + socialLinks.tiktok.replace(/^@/,'')) + '" target="_blank" rel="noopener">TikTok</a>' : ''}
+        ${socialLinks.youtube ? '<a class="social-pill" href="' + (socialLinks.youtube.startsWith('http') ? socialLinks.youtube : 'https://youtube.com/@' + socialLinks.youtube.replace(/^@/,'')) + '" target="_blank" rel="noopener">YouTube</a>' : ''}
+        ${socialLinks.website ? '<a class="social-pill" href="' + (socialLinks.website.startsWith('http') ? socialLinks.website : 'https://' + socialLinks.website) + '" target="_blank" rel="noopener">Sitio web</a>' : ''}
+      </div>
       <p class="opacity-70">${contact.address}</p>
       <p class="text-[10px] opacity-50 pt-2">Diseñado con tecnología LAV Digital MKT · Tarjeta Digital Gastronómica</p>
     </footer>
@@ -274,6 +294,7 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
       });
     }
 
+    function downloadContact(){const vcard=['BEGIN:VCARD','VERSION:3.0','FN:${restaurant.name}','ORG:${restaurant.name}','TEL;TYPE=WORK,VOICE:${contact.phone}','EMAIL:${contact.email}','ADR;TYPE=WORK:;;${contact.address};${contact.city};;;','END:VCARD'].join('\\n');const blob=new Blob([vcard],{type:'text/vcard;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='${restaurant.slug || 'restaurante'}.vcf';a.click();URL.revokeObjectURL(url);}
     const menuProducts = ${productsJson};
     const orderConfig = ${orderSettingsJson};
     const restaurantName = ${restaurantNameJson};
