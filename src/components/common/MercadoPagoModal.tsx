@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, CreditCard, ExternalLink, ShieldCheck, CheckCircle2, AlertCircle, Info, Lock } from 'lucide-react';
+import { X, CreditCard, ExternalLink, ShieldCheck, AlertCircle, Info, Lock } from 'lucide-react';
 import { MercadoPagoConfig } from '../../types/restaurant';
 
 interface MercadoPagoModalProps {
@@ -25,10 +25,10 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [preferenceUrl, setPreferenceUrl] = useState<string | null>(null);
-  const [testApproved, setTestApproved] = useState(false);
 
   if (!isOpen) return null;
 
+  // Checkout Pro creates its preference server-side; the private Access Token is the credential that authorizes it.
   const isConfigured = Boolean(config.publicKey && config.publicKey.length > 5);
 
   const handleGenerateCheckout = async () => {
@@ -52,7 +52,8 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || data.detail || `Mercado Pago respondió HTTP ${res.status}.`);
       if (!data.init_point) throw new Error('Mercado Pago no devolvió el enlace de pago.');
-      setPreferenceUrl(config.sandboxMode ? (data.sandbox_init_point || data.init_point) : data.init_point);
+      const checkoutUrl = config.sandboxMode ? (data.sandbox_init_point || data.init_point) : data.init_point;
+      setPreferenceUrl(checkoutUrl);
       return;
     } catch (error) {
       alert(error instanceof Error ? error.message : 'No se pudo conectar con Mercado Pago.');
@@ -149,35 +150,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
                 </div>
               )}
 
-              {testApproved ? (
-                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center space-y-2">
-                  <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
-                  <h4 className="text-sm font-bold text-emerald-900">¡Pago Registrado Exitosamente!</h4>
-                  <p className="text-xs text-emerald-700">
-                    Referencia de transacción: <strong>MP-{orderId}</strong>
-                  </p>
-                  <p className="text-[11px] text-slate-500">
-                    El pedido ha sido recibido y el restaurante comenzará su preparación.
-                  </p>
-                </div>
-              ) : preferenceUrl ? (
-                <div className="space-y-3">
-                  <p className="text-xs text-slate-600 text-center">
-                    Tu orden de pago ha sido generada. Haz clic en el botón para pagar directamente en la pasarela de Mercado Pago:
-                  </p>
-                  <a
-                    href={preferenceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-3 px-4 bg-[#009EE3] hover:bg-[#0082ba] text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors"
-                  >
-                    <span>Abrir Pasarela Mercado Pago</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-
-                  {config.sandboxMode && <p className="text-[11px] text-slate-500 text-center">Completa el pago con una cuenta y tarjeta de prueba de Mercado Pago para verificar el resultado real.</p>}
-                </div>
-              ) : (
+              {preferenceUrl ? (
                 <button
                   type="button"
                   onClick={handleGenerateCheckout}
@@ -199,7 +172,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
             onClick={onClose}
             className="px-4 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-800 transition-colors"
           >
-            {testApproved ? 'Listo' : 'Cerrar'}
+            Cerrar
           </button>
         </div>
       </div>
