@@ -115,13 +115,13 @@ export class RestaurantService {
       version: 1,
     };
 
-    list.unshift(newRestaurant);
-    const response = await fetch(`${API_BASE}/restaurants`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(list) });
+    const response = await fetch(`${API_BASE}/restaurants`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newRestaurant) });
     if (!response.ok) { const detail = await response.json().catch(() => ({})); throw new Error(detail.error || 'No se pudo guardar como nueva tarjeta.'); }
-    const persisted = await response.json() as Restaurant[];
-    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(persisted));
+    const persisted = await response.json() as Restaurant;
+    const updatedList = [persisted, ...list.filter((item) => item.slug !== finalSlug)];
+    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(updatedList));
     localStorage.setItem(STORAGE_KEY_ACTIVE_SLUG, finalSlug);
-    return persisted.find((item) => item.slug === finalSlug) || newRestaurant;
+    return persisted;
   }
 
   // Duplicate restaurant
@@ -155,33 +155,20 @@ export class RestaurantService {
       version: 1,
     };
 
-    list.unshift(newRestaurant);
-    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(list));
-
-    try {
-      await fetch(`${API_BASE}/restaurants`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newRestaurant),
-      });
-    } catch {
-      // local copy preserved
-    }
-
-    return newRestaurant;
+    const response = await fetch(`${API_BASE}/restaurants`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newRestaurant) });
+    if (!response.ok) { const detail = await response.json().catch(() => ({})); throw new Error(detail.error || 'No se pudo duplicar el restaurante.'); }
+    const persisted = await response.json() as Restaurant;
+    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify([persisted, ...list]));
+    return persisted;
   }
 
   // Delete restaurant
   static async deleteRestaurant(idOrSlug: string): Promise<void> {
     const list = await this.getRestaurants();
+    const response = await fetch(`${API_BASE}/restaurants/${encodeURIComponent(idOrSlug)}`, { method: 'DELETE' });
+    if (!response.ok) { const detail = await response.json().catch(() => ({})); throw new Error(detail.error || 'No se pudo eliminar el restaurante.'); }
     const filtered = list.filter((r) => r.id !== idOrSlug && r.slug !== idOrSlug);
     localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(filtered));
-
-    try {
-      await fetch(`${API_BASE}/restaurants/${encodeURIComponent(idOrSlug)}`, { method: 'DELETE' });
-    } catch {
-      // local copy updated
-    }
   }
 
   // Record an analytical event
