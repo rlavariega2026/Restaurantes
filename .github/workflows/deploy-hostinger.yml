@@ -34,11 +34,16 @@ jobs:
       - name: Build static application
         run: npm run build
 
-      - name: Verify build output
-        run: test -s dist/index.html
+      - name: TypeScript validation
+        run: npm run lint
 
-      - name: Validate PHP API syntax
-        run: php -l public/api.php
+      - name: Verify build output and deployable API files
+        run: |
+          test -s dist/index.html
+          test -s dist/api.php
+          test -s dist/.htaccess
+          php -l dist/api.php
+
 
       - name: Deploy only dist to the Restaurantes directory
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -51,3 +56,12 @@ jobs:
           local-dir: ./dist/
           server-dir: /domains/lavdigitalagency.com/public_html/Restaurantes/
           dangerous-clean-slate: false
+
+      - name: Verify live application and writable PHP API
+        run: |
+          curl --retry 8 --retry-delay 3 --retry-connrefused -fsS https://lavdigitalagency.com/Restaurantes/ -o /tmp/restaurantes-index.html
+          test -s /tmp/restaurantes-index.html
+          API_RESPONSE="$(curl --retry 8 --retry-delay 3 --retry-connrefused -fsS https://lavdigitalagency.com/Restaurantes/api/health)"
+          echo "$API_RESPONSE"
+          echo "$API_RESPONSE" | grep -q '"success":true'
+          echo "$API_RESPONSE" | grep -q '"storage_writable":true'
