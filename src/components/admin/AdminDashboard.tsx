@@ -2285,6 +2285,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
               <TemplateRenderer
                 restaurant={form}
                 onOpenProduct={() => {}}
+                onAddToCart={() => {}}
                 onOpenCart={() => {}}
                 onOpenShare={() => {}}
                 onOpenQr={() => {}}
