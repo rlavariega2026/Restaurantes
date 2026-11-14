@@ -164,7 +164,12 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
   const heroDisplayMode = branding.heroDisplayMode || 'cover';
   const heroContentPosition = branding.heroContentPosition || 'bottom';
   const heroScrimIntensity = branding.heroScrimIntensity || 'medium';
-  const heroButtons = branding.heroButtons || { showMenuBtn: true, showOrderBtn: true, showReserveBtn: true };
+  // Missing per-button values stay enabled so partial saved settings do not hide other actions.
+  const heroButtons = {
+    showMenuBtn: branding.heroButtons?.showMenuBtn !== false,
+    showOrderBtn: branding.heroButtons?.showOrderBtn !== false,
+    showReserveBtn: branding.heroButtons?.showReserveBtn !== false,
+  };
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -320,12 +325,12 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 
             {/* Optional Hero Action Buttons */}
             {(heroButtons.showMenuBtn || heroButtons.showOrderBtn || heroButtons.showReserveBtn) && (
-              <div className="flex flex-wrap items-center gap-2 pt-3">
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 pt-3 max-w-full">
                 {heroButtons.showMenuBtn && (
                   <button
                     onClick={() => scrollToSection('menu-section')}
                     style={{ backgroundColor: branding.accentColor }}
-                    className="py-2.5 px-4 rounded-xl text-slate-950 font-extrabold text-xs shadow-lg active:scale-95 transition-all flex items-center gap-1.5"
+                    className="min-w-0 px-3 py-2 rounded-lg text-slate-950 font-bold text-[11px] leading-tight shadow-md active:scale-[.98] transition-all flex items-center justify-center gap-1.5"
                   >
                     <Utensils className="w-3.5 h-3.5" />
                     <span>Ver Menú</span>
@@ -334,8 +339,8 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 
                 {heroButtons.showOrderBtn && (features.whatsappOrders || features.pickupOrders || features.deliveryOrders) && (
                   <button
-                    onClick={() => scrollToSection('menu-section')}
-                    className="py-2.5 px-4 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs backdrop-blur-md border border-white/25 active:scale-95 transition-all flex items-center gap-1.5"
+                    onClick={onOpenCart}
+                    className="min-w-0 px-3 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold text-[11px] leading-tight backdrop-blur-md border border-white/25 active:scale-[.98] transition-all flex items-center justify-center gap-1.5"
                   >
                     <ShoppingBag className="w-3.5 h-3.5" />
                     <span>Pedir Ahora</span>
@@ -347,7 +352,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                     href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, quisiera consultar disponibilidad para reservar una mesa.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="py-2.5 px-4 rounded-xl bg-black/40 hover:bg-black/60 text-white font-bold text-xs backdrop-blur-md border border-white/20 active:scale-95 transition-all flex items-center gap-1.5"
+                    className="min-w-0 px-3 py-2 rounded-lg bg-black/40 hover:bg-black/60 text-white font-bold text-[11px] leading-tight backdrop-blur-md border border-white/20 active:scale-[.98] transition-all flex items-center justify-center gap-1.5"
                   >
                     <Calendar className="w-3.5 h-3.5" />
                     <span>Reservar</span>
