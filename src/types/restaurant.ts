@@ -125,6 +125,7 @@ export interface RestaurantBranding {
     showOrderBtn?: boolean;
     showReserveBtn?: boolean;
   };
+  buttonDesign?: { variant?: 'solid' | 'outline' | 'glass' | 'soft'; fontFamily?: string; fontSize?: 'small' | 'medium' | 'large'; alignment?: 'left' | 'center' | 'right'; textColor?: string; backgroundColor?: string; borderColor?: string; radius?: 'soft' | 'rounded' | 'pill' };
 }
 
 export interface RestaurantFeatures {
@@ -181,6 +182,7 @@ export interface Restaurant {
   products: MenuItem[];
   sectionOrder: string[];
   analytics: RestaurantAnalytics;
+  ordering?: { enabled?: boolean; destination?: 'whatsapp' | 'custom_url' | 'disabled'; customUrl?: string; buttonLabel?: string };
   hostingerConfig?: {
     published: boolean;
     folder: string;

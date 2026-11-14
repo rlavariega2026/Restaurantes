@@ -896,6 +896,19 @@ const RESTAURANTES_API = '/Restaurantes/api';
                       </div>
                     </div>
 
+                    <div className="md:col-span-3 mt-2 p-4 rounded-2xl border border-indigo-200 bg-slate-950 text-white space-y-3">
+                      <h4 className="text-sm font-extrabold">Personalización de botones publicados</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                        <label>Tipo<select value={form.branding.buttonDesign?.variant || 'solid'} onChange={e=>setForm({...form,branding:{...form.branding,buttonDesign:{...form.branding.buttonDesign,variant:e.target.value as 'solid'|'outline'|'glass'|'soft'}}})} className="w-full rounded-lg p-2 text-slate-900"><option value="solid">Sólido</option><option value="outline">Contorno</option><option value="glass">Cristal</option><option value="soft">Suave</option></select></label>
+                        <label>Tipografía<select value={form.branding.buttonDesign?.fontFamily || 'Plus Jakarta Sans'} onChange={e=>setForm({...form,branding:{...form.branding,buttonDesign:{...form.branding.buttonDesign,fontFamily:e.target.value}}})} className="w-full rounded-lg p-2 text-slate-900"><option>Plus Jakarta Sans</option><option>DM Sans</option><option>Outfit</option><option>Montserrat</option><option>Playfair Display</option><option>Oswald</option></select></label>
+                        <label>Tamaño<select value={form.branding.buttonDesign?.fontSize || 'medium'} onChange={e=>setForm({...form,branding:{...form.branding,buttonDesign:{...form.branding.buttonDesign,fontSize:e.target.value as 'small'|'medium'|'large'}}})} className="w-full rounded-lg p-2 text-slate-900"><option value="small">Pequeño</option><option value="medium">Mediano</option><option value="large">Grande</option></select></label>
+                        <label>Alineación<select value={form.branding.buttonDesign?.alignment || 'center'} onChange={e=>setForm({...form,branding:{...form.branding,buttonDesign:{...form.branding.buttonDesign,alignment:e.target.value as 'left'|'center'|'right'}}})} className="w-full rounded-lg p-2 text-slate-900"><option value="left">Izquierda</option><option value="center">Centro</option><option value="right">Derecha</option></select></label>
+                        <label>Texto<input type="color" value={form.branding.buttonDesign?.textColor || '#ffffff'} onChange={e=>setForm({...form,branding:{...form.branding,buttonDesign:{...form.branding.buttonDesign,textColor:e.target.value}}})} className="w-full h-9"/></label>
+                        <label>Fondo<input type="color" value={form.branding.buttonDesign?.backgroundColor || form.branding.accentColor} onChange={e=>setForm({...form,branding:{...form.branding,buttonDesign:{...form.branding.buttonDesign,backgroundColor:e.target.value}}})} className="w-full h-9"/></label>
+                        <label>Borde<input type="color" value={form.branding.buttonDesign?.borderColor || form.branding.accentColor} onChange={e=>setForm({...form,branding:{...form.branding,buttonDesign:{...form.branding.buttonDesign,borderColor:e.target.value}}})} className="w-full h-9"/></label>
+                        <label>Forma<select value={form.branding.buttonDesign?.radius || 'rounded'} onChange={e=>setForm({...form,branding:{...form.branding,buttonDesign:{...form.branding.buttonDesign,radius:e.target.value as 'soft'|'rounded'|'pill'}}})} className="w-full rounded-lg p-2 text-slate-900"><option value="soft">Suave</option><option value="rounded">Redondeada</option><option value="pill">Cápsula</option></select></label>
+                      </div>
+                    </div>
                     <div>
                       <label className="font-semibold text-slate-700 block mb-1">Estilo de Botones</label>
                       <select
@@ -918,6 +931,16 @@ const RESTAURANTES_API = '/Restaurantes/api';
                   </div>
                 </div>
 
+                <div className="mt-4 p-4 rounded-2xl border border-emerald-200 bg-emerald-50 space-y-3">
+                  <h4 className="text-sm font-extrabold text-slate-900">Pedidos y destino del carrito</h4>
+                  <p className="text-[11px] text-slate-600">Los platillos se acumulan en «Mi pedido». Puedes apagar esta función o dirigir el resumen a WhatsApp o a tu propia página.</p>
+                  <label className="flex items-center gap-2 text-xs font-bold"><input type="checkbox" checked={form.ordering?.enabled !== false && form.ordering?.destination !== 'disabled'} onChange={e=>setForm({...form,ordering:{...form.ordering,enabled:e.target.checked,destination:e.target.checked?(form.ordering?.destination==='disabled'?'whatsapp':form.ordering?.destination||'whatsapp'):'disabled'}})}/> Activar carrito y pedidos</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <label className="text-xs font-semibold">Destino<select value={form.ordering?.destination || 'whatsapp'} onChange={e=>setForm({...form,ordering:{...form.ordering,enabled:true,destination:e.target.value as 'whatsapp'|'custom_url'|'disabled'}})} className="mt-1 w-full rounded-lg border bg-white px-3 py-2"><option value="whatsapp">WhatsApp del restaurante</option><option value="custom_url">Página o enlace personalizado</option><option value="disabled">Desactivado</option></select></label>
+                    <label className="text-xs font-semibold">Texto del botón<input value={form.ordering?.buttonLabel || 'Agregar al pedido'} onChange={e=>setForm({...form,ordering:{...form.ordering,buttonLabel:e.target.value}})} className="mt-1 w-full rounded-lg border bg-white px-3 py-2"/></label>
+                  </div>
+                  {form.ordering?.destination==='custom_url' && <label className="block text-xs font-semibold">URL de destino<input type="url" value={form.ordering.customUrl || ''} onChange={e=>setForm({...form,ordering:{...form.ordering,customUrl:e.target.value}})} placeholder="https://tusitio.com/pedidos" className="mt-1 w-full rounded-lg border bg-white px-3 py-2"/></label>}
+                </div>
                 {/* Feature Toggles */}
                 <div className="space-y-3 pt-4 border-t border-slate-200">
                   <h4 className="text-sm font-bold text-slate-900">Activación de Funciones y Botones</h4>
