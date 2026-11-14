@@ -649,10 +649,10 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
         </div>
 
         {/* Categories Horizontal Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+        <div className="flex flex-wrap items-center gap-2 pb-1 text-xs">
           <button
             onClick={() => setSelectedCategoryId('all')}
-            className={`px-3 py-1.5 rounded-lg whitespace-nowrap font-medium transition-all ${
+            className={`px-3.5 py-2 rounded-full whitespace-normal text-center font-semibold transition-all ${
               selectedCategoryId === 'all'
                 ? 'font-bold shadow-xs'
                 : 'opacity-70 hover:opacity-100'
