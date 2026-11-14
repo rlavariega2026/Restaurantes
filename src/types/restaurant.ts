@@ -188,6 +188,7 @@ export interface Restaurant {
   products: MenuItem[];
   sectionOrder: string[];
   analytics: RestaurantAnalytics;
+  wifi?: { enabled: boolean; name: string; password: string };
   ordering?: { enabled?: boolean; destination?: 'whatsapp' | 'custom_url' | 'disabled'; customUrl?: string; buttonLabel?: string };
   hostingerConfig?: {
     published: boolean;

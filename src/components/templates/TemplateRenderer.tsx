@@ -35,7 +35,8 @@ import {
   Radio,
   Copy,
   Check,
-  CreditCard
+  CreditCard,
+  Wifi
 } from 'lucide-react';
 import { Restaurant, MenuItem, MenuCategory, CartItem, ProductTag } from '../../types/restaurant';
 import { downloadVCard } from '../../services/storage';
@@ -68,6 +69,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [isPaymentsOpen, setIsPaymentsOpen] = useState(false);
+  const [wifiCopied, setWifiCopied] = useState(false);
   const [copiedPaymentField, setCopiedPaymentField] = useState<string | null>(null);
   const [selectedGalleryPhoto, setSelectedGalleryPhoto] = useState<string | null>(null);
 
@@ -830,6 +832,20 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                 />
               </div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* Wi-Fi appears immediately before payment methods when enabled */}
+      {restaurant.wifi?.enabled === true && (restaurant.wifi.name || restaurant.wifi.password) && (
+        <section className="px-4 py-3 max-w-5xl mx-auto w-full">
+          <div className="rounded-2xl border p-5 space-y-4" style={{backgroundColor:branding.surfaceColor,borderColor:`${branding.textColor}25`}}>
+            <h3 className="text-lg font-bold flex items-center gap-2"><Wifi className="w-5 h-5" style={{color:branding.accentColor}}/> Wi-Fi para invitados</h3>
+            {restaurant.wifi.name && <div className="space-y-1"><span className="text-xs opacity-60">Nombre de la red</span><p className="text-base font-semibold break-words">{restaurant.wifi.name}</p></div>}
+            {restaurant.wifi.password && <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="min-w-0"><span className="text-xs opacity-60">Contraseña</span><p className="text-base font-semibold break-all">{restaurant.wifi.password}</p></div>
+              <button type="button" className="px-4 py-2 rounded-full text-sm font-bold border" style={{borderColor:branding.accentColor,color:branding.textColor}} onClick={async()=>{try{await navigator.clipboard.writeText(restaurant.wifi!.password);setWifiCopied(true);setTimeout(()=>setWifiCopied(false),2000)}catch{setWifiCopied(false);alert('No se pudo copiar la contraseña.')}}}>{wifiCopied?'Copiada':'Copiar contraseña'}</button>
+            </div>}
           </div>
         </section>
       )}

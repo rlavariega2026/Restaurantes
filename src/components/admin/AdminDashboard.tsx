@@ -32,6 +32,7 @@ import {
   CheckCircle2,
   Play,
   Globe,
+  Wifi,
   X
 } from 'lucide-react';
 import JSZip from 'jszip';
@@ -1696,6 +1697,24 @@ const RESTAURANTES_API = '/Restaurantes/api';
                   <p className="text-xs text-slate-500">
                     Configura tus datos bancarios para transferencias directas sin comisiones y conecta Mercado Pago.
                   </p>
+                </div>
+
+                {/* Wi-Fi guest credentials, independent of payment settings */}
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                  <label className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                    <Wifi className="w-5 h-5 text-indigo-600" />
+                    <input type="checkbox" checked={form.wifi?.enabled === true} onChange={e => setForm({...form,wifi:{enabled:e.target.checked,name:form.wifi?.name || '',password:form.wifi?.password || ''}})} />
+                    Mostrar sección Wi-Fi en la tarjeta publicada
+                  </label>
+                  <p className="text-xs text-slate-500">El nombre de la red solo se muestra; únicamente la contraseña tendrá botón para copiar.</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <label className="text-xs font-semibold text-slate-700">Nombre de la red (SSID)
+                      <input type="text" className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2.5" value={form.wifi?.name || ''} onChange={e=>setForm({...form,wifi:{enabled:form.wifi?.enabled === true,name:e.target.value,password:form.wifi?.password || ''}})} placeholder="Wi-Fi del restaurante" />
+                    </label>
+                    <label className="text-xs font-semibold text-slate-700">Contraseña
+                      <input type="text" className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2.5" value={form.wifi?.password || ''} onChange={e=>setForm({...form,wifi:{enabled:form.wifi?.enabled === true,name:form.wifi?.name || '',password:e.target.value}})} placeholder="Contraseña para invitados" />
+                    </label>
+                  </div>
                 </div>
 
                 {/* SPEI Card */}
