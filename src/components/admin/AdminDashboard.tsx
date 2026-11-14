@@ -90,6 +90,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [hostingerCardName, setHostingerCardName] = useState('');
   const [hostingerTemplateName, setHostingerTemplateName] = useState('');
   const HOSTINGER_FOLDER = 'public_html/Restaurantes/';
+const RESTAURANTES_API = '/Restaurantes/api';
   const HOSTINGER_DOMAIN = 'lavdigitalagency.com';
   const [hostingerFolderName, setHostingerFolderName] = useState(HOSTINGER_FOLDER);
   const [isPublishingHostinger, setIsPublishingHostinger] = useState(false);
@@ -198,7 +199,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       const saved = await RestaurantService.saveRestaurant(form);
       setForm(saved);
       onUpdateRestaurant(saved);
-      const response = await fetch('/api/mercadopago/create-preference', {
+      const response = await fetch(`${RESTAURANTES_API}/mercadopago/create-preference`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -305,8 +306,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         setIsSaveModalOpen(false);
         setSaveSuccessMessage(null);
       }, 1400);
-    } catch {
-      alert('Error al guardar la tarjeta.');
+    } catch (error) {
+      alert(error instanceof Error ? `Error al guardar la tarjeta: ${error.message}` : 'Error al guardar la tarjeta.');
     } finally {
       setSaveLoading(false);
     }
@@ -355,12 +356,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       };
 
       const saved = await RestaurantService.saveRestaurant(updated);
+      const verifyResponse = await fetch(`${RESTAURANTES_API}/restaurants`, { cache: 'no-store' });
+      if (!verifyResponse.ok) throw new Error('El servidor guardó la tarjeta, pero no fue posible verificar su publicación.');
+      const publishedCards = await verifyResponse.json() as Restaurant[];
+      if (!publishedCards.some((item) => item.id === saved.id && item.hostingerConfig?.publicationSlug === publicationSlug)) throw new Error('La tarjeta no quedó registrada con su enlace público en el servidor.');
       setForm(saved);
       onUpdateRestaurant(saved);
       setHostingerPublishedUrl(liveUrl);
       setHostingerPublishSuccess(true);
-    } catch {
-      alert('Error al publicar la tarjeta en Hostinger.');
+    } catch (error) {
+      alert(error instanceof Error ? `Error al publicar la tarjeta en Hostinger: ${error.message}` : 'Error al publicar la tarjeta en Hostinger.');
     } finally {
       setIsPublishingHostinger(false);
     }
@@ -935,6 +940,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       { key: 'mercadoPago', label: 'Cobros Mercado Pago' },
                       { key: 'googleReviews', label: 'Reseñas de Google' },
                       { key: 'photoGallery', label: 'Galería de Fotos' },
+                      { key: 'socialLinks', label: 'Redes Sociales' },
                       { key: 'specialNotice', label: 'Aviso de Promoción' },
                     ].map((feat) => {
                       const enabled = (form.features as any)[feat.key];
