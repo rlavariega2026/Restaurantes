@@ -37,9 +37,11 @@ jobs:
       - name: TypeScript validation
         run: npm run lint
 
-      - name: Verify build output and deployable API files
+      - name: Include PHP API and rewrite rules in deploy bundle
         run: |
           test -s dist/index.html
+          cp public/api.php dist/api.php
+          cp public/.htaccess dist/.htaccess
           test -s dist/api.php
           test -s dist/.htaccess
           php -l dist/api.php
