@@ -6,6 +6,10 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
   const serializedData = JSON.stringify(restaurant).replace(/</g, '\\u003c');
   const orderSettings = restaurant.ordering || { enabled: true, destination: 'whatsapp', buttonLabel: 'Agregar al pedido' };
   const orderingEnabled = orderSettings.enabled !== false && orderSettings.destination !== 'disabled' && (orderSettings.destination === 'custom_url' || features.whatsappOrders || features.pickupOrders || features.deliveryOrders);
+  const productsJson = JSON.stringify(products).replace(/</g, '\\u003c');
+  const orderSettingsJson = JSON.stringify(orderSettings);
+  const restaurantNameJson = JSON.stringify(restaurant.name);
+  const whatsappPhoneJson = JSON.stringify(contact.whatsapp.replace(/\D/g, ''));
 
   return `<!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
@@ -270,8 +274,10 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
       });
     }
 
-    const menuProducts = ${JSON.stringify(products).replace(/</g, '\\u003c')};
-    const orderConfig = ${JSON.stringify(orderSettings)};
+    const menuProducts = ${productsJson};
+    const orderConfig = ${orderSettingsJson};
+    const restaurantName = ${restaurantNameJson};
+    const whatsappPhone = ${whatsappPhoneJson};
     const cart = {};
     function money(v){return '    function filterCategory(catId, btn) { document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('bg-amber-500','text-slate-950')); btn.classList.add('bg-amber-500','text-slate-950'); document.querySelectorAll('.product-card').forEach(card=>{card.style.display=(catId==='all'||card.getAttribute('data-category')===catId)?'flex':'none';}); }
   </script>
@@ -284,7 +290,8 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
     function renderCart(){const rows=Object.values(cart),count=rows.reduce((s,x)=>s+x.quantity,0),total=rows.reduce((s,x)=>s+x.quantity*Number(x.product.price||0),0);const c=document.getElementById('cart-count'),t=document.getElementById('cart-total'),pt=document.getElementById('cart-total-panel');if(c)c.textContent=count;if(t)t.textContent=money(total);if(pt)pt.textContent=money(total);const box=document.getElementById('cart-items');if(box)box.innerHTML=rows.map(x=>'<div class="flex items-center justify-between gap-3 rounded-xl bg-slate-100 p-3"><div class="min-w-0"><b class="text-sm">'+x.product.name+'</b><p class="text-xs text-slate-500">'+money(x.product.price)+'</p><div class="flex items-center gap-3 mt-2"><button onclick="changeQuantity(\''+x.product.id+'\',-1)">−</button><b>'+x.quantity+'</b><button onclick="changeQuantity(\''+x.product.id+'\',1)">+</button></div></div><b>'+money(x.quantity*x.product.price)+'</b></div>').join('')||'<p class="text-sm text-slate-500 text-center py-8">Tu pedido está vacío.</p>';const go=document.getElementById('checkout-button');if(go)go.disabled=!rows.length;}
     function openCart(){document.getElementById('cart-drawer')?.classList.remove('hidden');}
     function closeCart(){document.getElementById('cart-drawer')?.classList.add('hidden');}
-    function sendOrder(){const rows=Object.values(cart);if(!rows.length)return;const total=rows.reduce((s,x)=>s+x.quantity*Number(x.product.price||0),0);const message=['Pedido para ${restaurant.name}',...rows.map(x=>x.quantity+' x '+x.product.name+' — '+money(x.quantity*x.product.price)),'Total: '+money(total)].join('\n');if(orderConfig.destination==='custom_url'&&orderConfig.customUrl){const u=new URL(orderConfig.customUrl);u.searchParams.set('pedido',message);window.location.href=u.toString();return;}const phone='${contact.whatsapp.replace(/\D/g, '')}';if(!phone){alert('Falta configurar el WhatsApp del restaurante.');return;}window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(message),'_blank');}
+    function sendOrder(){const rows=Object.values(cart);if(!rows.length)return;const total=rows.reduce((s,x)=>s+x.quantity*Number(x.product.price||0),0);const message=['Pedido para '+restaurantName,...rows.map(x=>x.quantity+' x '+x.product.name+' — '+money(x.quantity*x.product.price)),'Total: '+money(total)].join('\n');if(orderConfig.destination==='custom_url'&&orderConfig.customUrl){const u=new URL(orderConfig.customUrl);u.searchParams.set('pedido',message);window.location.href=u.toString();return;}if(!whatsappPhone){alert('Falta configurar el WhatsApp del restaurante.');return;}window.open('https://wa.me/'+whatsappPhone+'?text='+encodeURIComponent(message),'_blank');}
+    renderCart();
     // Category filter
     function filterCategory(catId, btn) {
       document.querySelectorAll('.cat-pill').forEach(b => {
