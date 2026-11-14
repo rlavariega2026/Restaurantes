@@ -217,7 +217,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 
   return (
     <div
-      className={`min-h-screen text-slate-900 transition-colors duration-300 pb-24 ${branding.fontBody}`}
+      className={`restaurant-public-page min-h-screen text-slate-900 transition-colors duration-300 pb-24 ${branding.fontBody}`}
       style={{
         backgroundColor: branding.bgColor,
         color: branding.textColor,
@@ -442,7 +442,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
       {/* CONTINUOUS NATURAL PAGE PRESENTATION */}
       <section
         id="presentation-section"
-        className="px-5 py-4 border-b space-y-3"
+        className="restaurant-intro px-5 py-4 border-b space-y-3"
         style={{
           backgroundColor: branding.surfaceColor,
           borderColor: `${branding.textColor}1A`,
@@ -453,19 +453,19 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
           </p>
 
           {/* Quick Action Button Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-1.5 pt-1 text-[11px]">
+          <div className="restaurant-action-list flex flex-wrap items-center gap-2 pt-1 text-[11px]">
             {features.whatsappOrders && contact.whatsapp && (
-              <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, te contacto desde tu tarjeta digital.`)}`} target="_blank" rel="noopener noreferrer" className="min-h-10 min-w-0 px-2 py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 text-white text-[11px] leading-tight shadow-sm hover:brightness-105 active:scale-[.98] transition-all" style={{background: 'linear-gradient(135deg, #16a34a, #047857)'}}>
+              <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, te contacto desde tu tarjeta digital.`)}`} target="_blank" rel="noopener noreferrer" className="restaurant-action-button min-h-10 min-w-0 px-4 py-2 rounded-full font-semibold flex items-center justify-center gap-2 text-white text-xs leading-tight shadow-sm hover:brightness-105 active:scale-[.98] transition-all" style={{background: 'linear-gradient(135deg, #16a34a, #047857)'}}>
                 <MessageCircle className="w-3.5 h-3.5 shrink-0" /><span>WhatsApp</span>
               </a>
             )}
             {(contact.googleMapsUrl || contact.googleMapsQuery || contact.address) && (
-              <a href={contact.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(contact.googleMapsQuery || contact.address)}`} target="_blank" rel="noopener noreferrer" className="min-h-10 min-w-0 px-2 py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 border text-[11px] leading-tight hover:brightness-95 active:scale-[.98] transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}>
+              <a href={contact.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(contact.googleMapsQuery || contact.address)}`} target="_blank" rel="noopener noreferrer" className="restaurant-action-button min-h-10 min-w-0 px-4 py-2 rounded-full font-semibold flex items-center justify-center gap-2 border text-xs leading-tight hover:brightness-95 active:scale-[.98] transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}>
                 <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" /><span>Cómo llegar</span>
               </a>
             )}
             {contact.phone && (
-              <a href={`tel:${contact.phone.replace(/[^+\d]/g, '')}`} className="min-h-12 px-3 py-3 rounded-xl font-bold flex items-center justify-center gap-2 border hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}>
+              <a href={`tel:${contact.phone.replace(/[^+\d]/g, '')}`} className="restaurant-action-button min-h-10 px-4 py-2 rounded-full font-semibold flex items-center justify-center gap-2 border text-xs hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}>
                 <Phone className="w-3.5 h-3.5 text-sky-500 shrink-0" /><span>Llamar</span>
               </a>
             )}
@@ -473,7 +473,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
               <ContactRound className="w-3.5 h-3.5 text-indigo-500 shrink-0" /><span>Guardar contacto</span>
             </button>
             {features.tableReservations && contact.whatsapp && (
-              <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, quisiera reservar una mesa. ¿Me comparten disponibilidad?`)}`} target="_blank" rel="noopener noreferrer" className="min-h-10 min-w-0 px-2 py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 border border-amber-400/40 bg-amber-500/10 text-amber-700 text-[11px] leading-tight hover:brightness-95 active:scale-[.98] transition-all">
+              <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, quisiera reservar una mesa. ¿Me comparten disponibilidad?`)}`} target="_blank" rel="noopener noreferrer" className="restaurant-action-button min-h-10 min-w-0 px-4 py-2 rounded-full font-semibold flex items-center justify-center gap-2 border border-amber-400/40 bg-amber-500/10 text-amber-700 text-xs leading-tight hover:brightness-95 active:scale-[.98] transition-all">
                 <Calendar className="w-3.5 h-3.5 shrink-0" /><span>Reservar mesa</span>
               </a>
             )}
@@ -605,7 +605,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
       {/* 3. SPECIAL NOTICE BANNER */}
       {features.specialNotice && restaurant.specialNoticeText && (
         <div
-          className="mx-4 my-3 p-3 rounded-xl border flex items-start gap-2.5 text-xs shadow-xs"
+          className="restaurant-notice mx-4 my-3 p-3 rounded-xl border flex items-start gap-2.5 text-xs shadow-xs"
           style={{
             backgroundColor: `${branding.accentColor}1A`,
             borderColor: `${branding.accentColor}50`,
@@ -623,7 +623,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
       )}
 
       {/* 4. INTERACTIVE MENU SECTION */}
-      <section id="menu-section" className="px-4 py-4 space-y-4">
+      <section id="menu-section" className="restaurant-menu px-4 py-4 space-y-4">
         {/* Section Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -662,7 +662,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
         </div>
 
         {/* Categories Horizontal Tabs */}
-        <div className="flex flex-wrap items-center gap-2 pb-1 text-xs">
+        <div className="restaurant-category-list flex flex-wrap items-center gap-2 pb-1 text-xs">
           <button
             onClick={() => setSelectedCategoryId('all')}
             className={`px-3.5 py-2 rounded-full whitespace-normal text-center font-semibold transition-all ${
@@ -701,7 +701,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
         </div>
 
         {/* Tag Filters (Favorito, Picante, Veg, Nuevo) */}
-        <div className="flex items-center gap-1.5 overflow-x-auto text-[11px] pb-1">
+        <div className="restaurant-tag-list flex flex-wrap items-center gap-2 text-[11px] pb-1">
           {[
             { key: 'all', label: 'Todos', icon: <ListFilter className="w-3.5 h-3.5" /> },
             { key: 'favorito', label: 'Favoritos', icon: <Heart className="w-3.5 h-3.5" /> },
@@ -739,19 +739,42 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="restaurant-product-grid grid grid-cols-1 md:grid-cols-2 gap-3">
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
                 onClick={() => onOpenProduct(product)}
-                className="group p-0 rounded-3xl border transition-all cursor-pointer flex flex-col overflow-hidden hover:shadow-xl active:scale-[0.99]"
+                className="menu-product-card group p-0 rounded-3xl border transition-all cursor-pointer flex flex-col overflow-hidden hover:shadow-xl active:scale-[0.99]"
                 style={{
                   backgroundColor: branding.surfaceColor,
                   borderColor: `${branding.textColor}1A`,
                 }}
               >
+                {/* Product Thumbnail */}
+                <div className="menu-product-photo w-full aspect-[16/10] overflow-hidden bg-slate-100 shrink-0 relative">
+                  {product.imageUrl ? (
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-400 bg-slate-200/50">
+                      <Utensils className="w-6 h-6" />
+                    </div>
+                  )}
+                  {!product.available && (
+                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center p-1 text-center">
+                      <span className="text-[9px] font-bold text-white uppercase tracking-wider">
+                        Agotado
+                      </span>
+                    </div>
+                  )}
+                </div>
+
                 {/* Product Info */}
-                <div className="flex-1 flex flex-col justify-between min-w-0 p-4">
+                <div className="menu-product-info flex-1 flex flex-col justify-between min-w-0 p-4">
                   <div className="space-y-1">
                     {/* Tags row */}
                     {product.tags && product.tags.length > 0 && (
@@ -784,29 +807,6 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                     )}
                   </div>
                 </div>
-
-                {/* Product Thumbnail */}
-                <div className="w-full aspect-[16/10] overflow-hidden bg-slate-100 shrink-0 relative">
-                  {product.imageUrl ? (
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400 bg-slate-200/50">
-                      <Utensils className="w-6 h-6" />
-                    </div>
-                  )}
-                  {!product.available && (
-                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center p-1 text-center">
-                      <span className="text-[9px] font-bold text-white uppercase tracking-wider">
-                        Agotado
-                      </span>
-                    </div>
-                  )}
-                </div>
               </div>
             ))}
           </div>
@@ -814,7 +814,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
       </section>
 
       {orderingEnabled && cartCount > 0 && (
-        <button type="button" onClick={onOpenCart} className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 rounded-full px-5 py-3 shadow-2xl border border-white/20 backdrop-blur-xl text-sm font-extrabold active:scale-95 transition-all" style={{backgroundColor:branding.accentColor,color:'#111827'}}>
+        <button type="button" onClick={onOpenCart} className="restaurant-cart-float fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 rounded-full px-5 py-3 shadow-2xl border border-white/20 backdrop-blur-xl text-sm font-extrabold active:scale-95 transition-all" style={{backgroundColor:branding.accentColor,color:'#111827'}}>
           <ShoppingBag className="w-4 h-4" /><span>Mi pedido</span><span className="rounded-full bg-black/15 px-2 py-1 text-xs">{cartCount}</span><span className="tabular-nums">${cartTotal.toLocaleString('es-MX')} MXN</span>
         </button>
       )}
@@ -1083,7 +1083,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 
       {/* 7. SOCIAL NETWORKS & FOOTER */}
       <footer
-        className="mt-6 px-5 py-6 border-t text-center space-y-4"
+        className="restaurant-footer mt-6 px-5 py-6 border-t text-center space-y-4"
         style={{
           backgroundColor: branding.surfaceColor,
           borderColor: `${branding.textColor}15`,
@@ -1091,7 +1091,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
       >
         {/* Social Icons */}
         {features.socialLinks && (
-          <div className="flex flex-wrap items-center justify-center gap-2.5">
+          <div className="restaurant-social-list flex flex-wrap items-center justify-center gap-3">
             {socialLinks.whatsapp && <a href={`https://wa.me/${socialLinks.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}20`,color:branding.textColor}}><MessageCircle className="w-4 h-4" /></a>}
             {socialLinks.instagram && <a href={socialHref(socialLinks.instagram,'instagram')} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}20`,color:branding.textColor}}><Instagram className="w-4 h-4" /></a>}
             {socialLinks.facebook && <a href={socialHref(socialLinks.facebook,'facebook')} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}20`,color:branding.textColor}}><Facebook className="w-4 h-4" /></a>}

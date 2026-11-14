@@ -42,3 +42,88 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(100, 116, 139, 0.6);
 }
+
+
+/* LAV Restaurant — editorial, mobile-first public experience */
+.restaurant-public-page { overflow-x: clip; }
+.restaurant-public-page > header { padding-inline: clamp(18px, 4vw, 56px) !important; }
+.restaurant-public-page .restaurant-intro {
+  width: min(100% - 32px, 1180px); margin: 0 auto; padding: clamp(22px, 4vw, 42px) 0 !important;
+  border: 0 !important; display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px !important;
+}
+.restaurant-public-page .restaurant-intro > p { max-width: 760px; font-size: clamp(14px, 1.3vw, 17px) !important; line-height: 1.8 !important; opacity: .78; }
+.restaurant-public-page .restaurant-action-list { gap: 10px !important; }
+.restaurant-public-page .restaurant-action-button {
+  min-height: 42px !important; padding: 10px 17px !important; border-radius: 999px !important;
+  font-size: 12px !important; font-weight: 700 !important; letter-spacing: .01em;
+  box-shadow: 0 5px 18px rgba(15,23,42,.07);
+}
+.restaurant-public-page .restaurant-hours > button {
+  border: 0 !important; border-radius: 18px !important; background: color-mix(in srgb, currentColor 4%, transparent) !important;
+  padding: 18px 20px !important; box-shadow: none !important;
+}
+.restaurant-public-page .restaurant-notice {
+  margin-top: 24px !important; margin-bottom: 24px !important; padding: 20px 22px !important;
+  border: 0 !important; border-left: 3px solid var(--lav-accent, #b88a45) !important;
+  border-radius: 4px 18px 18px 4px !important; box-shadow: none !important;
+}
+.restaurant-public-page .restaurant-menu { width: min(100% - 32px, 1180px); margin: 0 auto; padding: clamp(26px, 5vw, 54px) 0 !important; }
+.restaurant-public-page .restaurant-menu h2 { font-size: clamp(28px, 4vw, 42px) !important; letter-spacing: -.04em !important; line-height: 1.05 !important; }
+.restaurant-public-page .restaurant-menu > div:first-child p { font-size: 13px !important; margin-top: 8px; }
+.restaurant-public-page .restaurant-menu input {
+  min-height: 48px; border-radius: 999px !important; padding-left: 44px !important; font-size: 14px !important;
+  box-shadow: 0 4px 20px rgba(15,23,42,.04);
+}
+.restaurant-public-page .restaurant-category-list { gap: 8px !important; padding-block: 4px 8px; }
+.restaurant-public-page .restaurant-category-list button {
+  border: 1px solid color-mix(in srgb, currentColor 15%, transparent) !important; border-radius: 999px !important;
+  padding: 10px 15px !important; font-size: 12px !important; line-height: 1.2; background: transparent;
+}
+.restaurant-public-page .restaurant-tag-list { gap: 8px !important; }
+.restaurant-public-page .restaurant-tag-list button {
+  border: 0 !important; background: color-mix(in srgb, currentColor 6%, transparent) !important; color: inherit !important;
+  border-radius: 999px !important; padding: 8px 12px !important; font-size: 11px !important;
+}
+.restaurant-public-page .restaurant-tag-list button[class*="bg-slate-900"] { background: #171717 !important; color: white !important; }
+.restaurant-public-page .restaurant-product-grid { gap: 22px !important; }
+.restaurant-public-page .menu-product-card {
+  border: 0 !important; border-radius: 22px !important; background: color-mix(in srgb, currentColor 3%, transparent) !important;
+  box-shadow: 0 8px 32px rgba(15,23,42,.07) !important; transition: transform .25s ease, box-shadow .25s ease;
+}
+.restaurant-public-page .menu-product-card:hover { transform: translateY(-3px); box-shadow: 0 16px 42px rgba(15,23,42,.12) !important; }
+.restaurant-public-page .menu-product-photo { aspect-ratio: 16 / 10 !important; background: color-mix(in srgb, currentColor 7%, transparent); }
+.restaurant-public-page .menu-product-photo img { object-fit: cover !important; }
+.restaurant-public-page .menu-product-info { padding: 20px 21px 22px !important; min-height: 178px; }
+.restaurant-public-page .menu-product-info h3 { font-size: clamp(16px, 1.4vw, 19px) !important; line-height: 1.25 !important; letter-spacing: -.02em; white-space: normal !important; }
+.restaurant-public-page .menu-product-info p { font-size: 13px !important; line-height: 1.65 !important; margin-top: 6px; }
+.restaurant-public-page .menu-product-info > div:last-child { padding-top: 18px !important; }
+.restaurant-public-page .menu-product-info > div:last-child > span { font-size: 18px !important; letter-spacing: -.03em; }
+.restaurant-public-page .menu-product-info button { min-height: 40px; padding: 10px 17px !important; border-radius: 999px !important; font-size: 12px !important; }
+.restaurant-public-page .restaurant-cart-float {
+  bottom: max(18px, env(safe-area-inset-bottom)) !important; max-width: calc(100vw - 28px); padding: 13px 19px !important;
+  border-radius: 999px !important; font-size: 12px !important; box-shadow: 0 14px 42px rgba(0,0,0,.24) !important;
+}
+.restaurant-public-page .restaurant-social-list { gap: 12px !important; }
+.restaurant-public-page .restaurant-social-list a {
+  width: 44px !important; height: 44px !important; border: 0 !important; border-radius: 50% !important;
+  background: color-mix(in srgb, currentColor 7%, transparent); box-shadow: none !important;
+}
+.restaurant-public-page .restaurant-footer {
+  width: 100% !important; max-width: none !important; margin-top: 52px !important;
+  padding: 40px 20px calc(40px + env(safe-area-inset-bottom)) !important;
+  border-top: 0 !important; background: color-mix(in srgb, currentColor 4%, transparent) !important;
+}
+@media (min-width: 900px) {
+  .restaurant-public-page .restaurant-intro { grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); align-items: center; }
+}
+@media (max-width: 640px) {
+  .restaurant-public-page > section:first-of-type:not(#presentation-section) > div:first-child { height: 68svh !important; min-height: 520px; }
+  .restaurant-public-page .restaurant-menu { width: calc(100% - 28px) !important; }
+  .restaurant-public-page .restaurant-product-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 18px !important; }
+  .restaurant-public-page .restaurant-category-list button { font-size: 11px !important; padding: 9px 12px !important; }
+  .restaurant-public-page .restaurant-action-list { gap: 8px !important; }
+  .restaurant-public-page .restaurant-action-button { flex: 1 1 calc(50% - 8px); min-width: 0; }
+  .restaurant-public-page .restaurant-hours > button { align-items: flex-start !important; gap: 10px; }
+  .restaurant-public-page .restaurant-hours > button > div:last-child { font-size: 10px !important; }
+  .restaurant-public-page .restaurant-cart-float { gap: 8px !important; white-space: nowrap; }
+}
