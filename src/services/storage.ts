@@ -4,12 +4,13 @@ import { Restaurant, Order, OrderStatus } from '../types/restaurant';
 const STORAGE_KEY_RESTAURANTS = 'lav_restaurantes_data_v1';
 const STORAGE_KEY_ORDERS = 'lav_restaurantes_orders_v1';
 const STORAGE_KEY_ACTIVE_SLUG = 'lav_active_restaurant_slug';
+const API_BASE = '/Restaurantes/api';
 
 export class RestaurantService {
   // Load all restaurants
   static async getRestaurants(): Promise<Restaurant[]> {
     try {
-      const res = await fetch('/api/restaurants');
+      const res = await fetch(`${API_BASE}/restaurants`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
@@ -61,7 +62,7 @@ export class RestaurantService {
       list.push(updated);
     }
 
-    const response = await fetch('/api/restaurants', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(list) });
+    const response = await fetch(`${API_BASE}/restaurants`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(list) });
     if (!response.ok) { const detail = await response.json().catch(() => ({})); throw new Error(detail.error || 'No se pudo guardar en el servidor.'); }
     const persisted = await response.json() as Restaurant[];
     localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(persisted));
@@ -115,7 +116,7 @@ export class RestaurantService {
     };
 
     list.unshift(newRestaurant);
-    const response = await fetch('/api/restaurants', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(list) });
+    const response = await fetch(`${API_BASE}/restaurants`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(list) });
     if (!response.ok) { const detail = await response.json().catch(() => ({})); throw new Error(detail.error || 'No se pudo guardar como nueva tarjeta.'); }
     const persisted = await response.json() as Restaurant[];
     localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(persisted));
@@ -158,7 +159,7 @@ export class RestaurantService {
     localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(list));
 
     try {
-      await fetch('/api/restaurants', {
+      await fetch(`${API_BASE}/restaurants`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newRestaurant),
@@ -177,7 +178,7 @@ export class RestaurantService {
     localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(filtered));
 
     try {
-      await fetch(`/api/restaurants/${idOrSlug}`, { method: 'DELETE' });
+      await fetch(`${API_BASE}/restaurants/${encodeURIComponent(idOrSlug)}`, { method: 'DELETE' });
     } catch {
       // local copy updated
     }
@@ -196,7 +197,7 @@ export class RestaurantService {
     localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(list));
 
     try {
-      fetch(`/api/analytics/${slug}/event`, {
+      fetch(`${API_BASE}/analytics/${encodeURIComponent(slug)}/event`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ event }),
@@ -227,7 +228,7 @@ export class OrderService {
   static async getOrders(restaurantSlug?: string): Promise<Order[]> {
     let orders: Order[] = [];
     try {
-      const res = await fetch(`/api/orders${restaurantSlug ? `?slug=${restaurantSlug}` : ''}`);
+      const res = await fetch(`${API_BASE}/orders${restaurantSlug ? `?slug=${encodeURIComponent(restaurantSlug)}` : ''}`);
       if (res.ok) {
         orders = await res.json();
       }
@@ -265,7 +266,7 @@ export class OrderService {
     localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(current));
 
     try {
-      await fetch('/api/orders', {
+      await fetch(`${API_BASE}/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newOrder),
@@ -287,7 +288,7 @@ export class OrderService {
     localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(current));
 
     try {
-      await fetch(`/api/orders/${orderId}`, {
+      await fetch(`${API_BASE}/orders/${encodeURIComponent(orderId)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderStatus: status }),
