@@ -702,22 +702,6 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
           })}
         </div>
 
-        {/* Tag Filters (Favorito, Picante, Veg, Nuevo) */}
-        <div className="restaurant-tag-list flex flex-wrap items-center gap-2 text-[11px] pb-1">
-          {[
-            { key: 'all', label: 'Todos', icon: <ListFilter className="w-3.5 h-3.5" /> },
-            { key: 'favorito', label: 'Favoritos', icon: <Heart className="w-3.5 h-3.5" /> },
-            { key: 'nuevo', label: 'Nuevos', icon: <Sparkles className="w-3.5 h-3.5" /> },
-            { key: 'chef', label: 'Chef', icon: <Award className="w-3.5 h-3.5" /> },
-            { key: 'picante', label: 'Picantes', icon: <Flame className="w-3.5 h-3.5" /> },
-            { key: 'vegetariano', label: 'Veganos', icon: <Leaf className="w-3.5 h-3.5" /> },
-          ].map((tag) => (
-            <button key={tag.key} onClick={() => setSelectedTag(tag.key)} className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-[11px] font-semibold whitespace-nowrap transition-all ${selectedTag === tag.key ? 'border-slate-900 bg-slate-900 text-white shadow-sm' : 'border-slate-200 bg-white/70 opacity-80 hover:opacity-100 hover:border-slate-400'}`}>
-              {tag.icon}<span>{tag.label}</span>
-            </button>
-          ))}
-        </div>
-
         {/* Products Grid / Cards */}
         {filteredProducts.length === 0 ? (
           <div
@@ -801,7 +785,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                     <span className="text-sm font-extrabold tabular-nums" style={{fontSize:product.textDesign?.priceSize || 18,color:product.textDesign?.priceColor || "inherit"}}>
                       ${product.price} MXN
                     </span>
-                    {orderingEnabled && (
+                    {orderingEnabled && branding.showProductOrderButtons !== false && (
                       <button type="button" onClick={(event) => { event.stopPropagation(); handleQuickAdd(product); }} disabled={!product.available} className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-extrabold shadow-sm transition-all hover:-translate-y-0.5 disabled:opacity-40" style={configuredButtonStyle}>
                         <ShoppingBag className="w-3.5 h-3.5" />
                         {product.variants?.length || product.extras?.length ? 'Elegir opciones' : 'Agregar'}
@@ -825,8 +809,8 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
       {features.photoGallery && branding.gallery && branding.gallery.length > 0 && (
         <section className="px-4 py-4 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className={`text-lg font-bold ${branding.fontDisplay}`}>
-              Galería & Ambiente
+            <h3 className={`text-lg font-bold ${branding.fontDisplay}`} style={{fontSize:branding.galleryTitleSize || 22,textAlign:branding.galleryTitleAlignment || "left",color:branding.galleryTitleColor || "inherit"}}>
+              {branding.galleryTitle || "Galería & Ambiente"}
             </h3>
             <span className="text-xs opacity-60">Toca para ampliar</span>
           </div>

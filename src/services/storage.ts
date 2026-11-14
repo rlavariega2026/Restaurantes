@@ -25,7 +25,7 @@ export class RestaurantService {
       if (res.ok) {
         const data = await apiJson<Restaurant[]>(res);
         if (Array.isArray(data) && data.length > 0) {
-          localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(data));
+          // El servidor es la fuente de verdad; no duplicar fotografías en localStorage.
           return data;
         }
       }
@@ -46,7 +46,7 @@ export class RestaurantService {
     }
 
     // Seed initial
-    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(INITIAL_RESTAURANTS));
+    // Los datos iniciales se usan en memoria, sin duplicarlos en el navegador.
     return INITIAL_RESTAURANTS;
   }
 
@@ -76,7 +76,7 @@ export class RestaurantService {
     const response = await fetch(`${API_BASE}/restaurants`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(list) });
     const persisted = await apiJson<Restaurant[]>(response);
     if (!Array.isArray(persisted)) throw new Error('El servidor no confirmó el guardado de la tarjeta.');
-    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(persisted));
+    // Persistencia confirmada por API; sin copia local de imágenes.
     const saved = persisted.find((item) => item.id === updated.id) || updated;
     return { ...saved, mercadoPagoConfig: { ...saved.mercadoPagoConfig, accessToken: restaurant.mercadoPagoConfig.accessToken } };
   }
@@ -130,7 +130,7 @@ export class RestaurantService {
     const response = await fetch(`${API_BASE}/restaurants`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newRestaurant) });
     const persisted = await apiJson<Restaurant>(response);
     const updatedList = [persisted, ...list.filter((item) => item.slug !== finalSlug)];
-    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(updatedList));
+    // Persistencia confirmada por API; sin copia local de imágenes.
     localStorage.setItem(STORAGE_KEY_ACTIVE_SLUG, finalSlug);
     return { ...persisted, mercadoPagoConfig: { ...persisted.mercadoPagoConfig, accessToken: newRestaurant.mercadoPagoConfig.accessToken } };
   }
@@ -168,7 +168,7 @@ export class RestaurantService {
 
     const response = await fetch(`${API_BASE}/restaurants`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newRestaurant) });
     const persisted = await apiJson<Restaurant>(response);
-    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify([persisted, ...list]));
+    // No duplicar el catálogo en localStorage.
     return persisted;
   }
 
@@ -178,7 +178,7 @@ export class RestaurantService {
     const response = await fetch(`${API_BASE}/restaurants/${encodeURIComponent(idOrSlug)}`, { method: 'DELETE' });
     await apiJson<{success:boolean}>(response);
     const filtered = list.filter((r) => r.id !== idOrSlug && r.slug !== idOrSlug);
-    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(filtered));
+    // No duplicar el catálogo en localStorage.
   }
 
   // Record an analytical event
@@ -191,7 +191,7 @@ export class RestaurantService {
       item.analytics = { views: 0, whatsappClicks: 0, menuViews: 0, qrScans: 0, ordersCount: 0 };
     }
     item.analytics[event] = (item.analytics[event] || 0) + 1;
-    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(list));
+    // No duplicar el catálogo en localStorage.
 
     try {
       fetch(`${API_BASE}/analytics/${encodeURIComponent(slug)}/event`, {
@@ -215,7 +215,7 @@ export class RestaurantService {
 
   // Reset to default 20 restaurants
   static resetToDefault(): Restaurant[] {
-    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(INITIAL_RESTAURANTS));
+    // Los datos iniciales se usan en memoria, sin duplicarlos en el navegador.
     return INITIAL_RESTAURANTS;
   }
 }

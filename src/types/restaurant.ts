@@ -115,6 +115,11 @@ export interface RestaurantBranding {
   buttonStyle: ButtonStyle;
   gallery: GalleryPhoto[];
   videoUrl?: string;
+  showProductOrderButtons?: boolean;
+  galleryTitle?: string;
+  galleryTitleSize?: number;
+  galleryTitleAlignment?: "left" | "center" | "right";
+  galleryTitleColor?: string;
   customTemplateName?: string;
   // Configuración especial de Portada Inmersiva (100dvh)
   heroDisplayMode?: 'cover' | 'contain';

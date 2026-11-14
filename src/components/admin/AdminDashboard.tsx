@@ -581,8 +581,6 @@ const RESTAURANTES_API = '/Restaurantes/api';
               { id: 'contact', label: '4. Contacto & Horarios', icon: Phone },
               { id: 'payments', label: '5. SPEI & Mercado Pago', icon: CreditCard },
               { id: 'orders', label: `6. Pedidos (${orders.length})`, icon: ShoppingBag },
-              { id: 'share', label: '7. QR & NFC', icon: QrCode },
-              { id: 'analytics', label: '8. Analíticas', icon: BarChart3 },
               { id: 'manage', label: '9. Ajustes & Hostinger', icon: Building2 },
             ].map((tab) => {
               const Icon = tab.icon;
@@ -1018,6 +1016,11 @@ const RESTAURANTES_API = '/Restaurantes/api';
                   </button>
                 </div>
 
+                <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+                  <h4 className="font-bold text-sm">Controles del menú publicado</h4>
+                  <label className="flex items-center gap-2 text-xs font-semibold"><input type="checkbox" checked={form.branding.showProductOrderButtons !== false} onChange={e=>setForm({...form,branding:{...form.branding,showProductOrderButtons:e.target.checked}})}/> Mostrar botones «Agregar / Elegir opciones» en los platillos</label>
+                  <p className="text-xs text-slate-500">Si desactivas los botones, se conservan los platillos, las categorías y los precios.</p>
+                </div>
                 {/* Categories Management Strip */}
                 <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
@@ -1138,7 +1141,16 @@ const RESTAURANTES_API = '/Restaurantes/api';
             {/* TAB 3: PHOTOS & COVERS */}
             {activeTab === 'photos' && (
               <div className="space-y-6">
-                <div>
+                 <div className="rounded-xl border border-slate-200 p-4 bg-white space-y-3">
+                  <h4 className="font-bold text-sm">Título de la galería publicada</h4>
+                  <input className="w-full rounded-lg border border-slate-300 p-2 text-sm" value={form.branding.galleryTitle || ''} placeholder="Galería & Ambiente" onChange={e=>setForm({...form,branding:{...form.branding,galleryTitle:e.target.value}})}/>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <label>Tamaño (px)<input type="number" min="12" max="48" className="w-full border rounded-lg p-2" value={form.branding.galleryTitleSize || 22} onChange={e=>setForm({...form,branding:{...form.branding,galleryTitleSize:Number(e.target.value)}})}/></label>
+                    <label>Alineación<select className="w-full border rounded-lg p-2" value={form.branding.galleryTitleAlignment || 'left'} onChange={e=>setForm({...form,branding:{...form.branding,galleryTitleAlignment:e.target.value as 'left'|'center'|'right'}})}><option value="left">Izquierda</option><option value="center">Centro</option><option value="right">Derecha</option></select></label>
+                    <label>Color<input type="color" className="w-full h-9" value={form.branding.galleryTitleColor || '#ffffff'} onChange={e=>setForm({...form,branding:{...form.branding,galleryTitleColor:e.target.value}})}/></label>
+                  </div>
+                </div>
+               <div>
                   <h3 className="text-base font-bold text-slate-900">Fotos & Contenido Visual</h3>
                   <p className="text-xs text-slate-500">
                     Cambia la foto de portada principal y administra la galería de fotos gastronómicas y de ambiente.
@@ -1192,36 +1204,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
                     />
                   </div>
 
-                  {/* Quick Select from Built-in Culinary High-Res Assets */}
-                  <div className="space-y-1.5 pt-1">
-                    <p className="text-[11px] font-bold text-slate-700">O escoge de las fotos gastronómicas de alta resolución:</p>
-                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                      {[
-                        { url: '/src/assets/images/hero_immersive_culinary_1793144478747.jpg', label: 'Vertical 9:16' },
-                        { url: '/src/assets/images/hero_culinary_editorial_1793142965729.jpg', label: 'Alta Cocina' },
-                        { url: '/src/assets/images/food_steakhouse_ribeye_1793142977286.jpg', label: 'Steakhouse' },
-                        { url: '/src/assets/images/food_tacos_gourmet_1793142978654.jpg', label: 'Tacos' },
-                        { url: '/src/assets/images/food_sushi_omakase_1793142979708.jpg', label: 'Sushi' },
-                        { url: '/src/assets/images/food_cafe_pastry_1793142979018.jpg', label: 'Café & Pan' },
-                      ].map((img, i) => (
-                        <div
-                          key={i}
-                          onClick={() =>
-                            setForm({
-                              ...form,
-                              branding: { ...form.branding, coverUrl: img.url },
-                            })
-                          }
-                          className="h-16 rounded-lg overflow-hidden border-2 cursor-pointer hover:opacity-90 relative"
-                        >
-                          <img src={img.url} alt={img.label} className="w-full h-full object-cover" />
-                          <span className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[9px] text-center font-bold py-0.5">
-                            {img.label}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+
                 </div>
 
                 {/* Dedicated Portada Inmersiva Controls */}
