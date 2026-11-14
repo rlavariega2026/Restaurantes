@@ -425,28 +425,28 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
           </p>
 
           {/* Quick Action Button Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 pt-1 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-1.5 pt-1 text-[11px]">
             {features.whatsappOrders && contact.whatsapp && (
-              <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, te contacto desde tu tarjeta digital.`)}`} target="_blank" rel="noopener noreferrer" className="min-h-12 px-3 py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-white shadow-sm hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 transition-all" style={{background: 'linear-gradient(135deg, #16a34a, #047857)'}}>
-                <MessageCircle className="w-4 h-4" /><span>WhatsApp</span>
+              <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, te contacto desde tu tarjeta digital.`)}`} target="_blank" rel="noopener noreferrer" className="min-h-10 min-w-0 px-2 py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 text-white text-[11px] leading-tight shadow-sm hover:brightness-105 active:scale-[.98] transition-all" style={{background: 'linear-gradient(135deg, #16a34a, #047857)'}}>
+                <MessageCircle className="w-3.5 h-3.5 shrink-0" /><span>WhatsApp</span>
               </a>
             )}
             {(contact.googleMapsUrl || contact.googleMapsQuery || contact.address) && (
-              <a href={contact.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(contact.googleMapsQuery || contact.address)}`} target="_blank" rel="noopener noreferrer" className="min-h-12 px-3 py-3 rounded-xl font-bold flex items-center justify-center gap-2 border hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}>
-                <MapPin className="w-4 h-4 text-rose-500" /><span>Cómo llegar</span>
+              <a href={contact.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(contact.googleMapsQuery || contact.address)}`} target="_blank" rel="noopener noreferrer" className="min-h-10 min-w-0 px-2 py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 border text-[11px] leading-tight hover:brightness-95 active:scale-[.98] transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}>
+                <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" /><span>Cómo llegar</span>
               </a>
             )}
             {contact.phone && (
               <a href={`tel:${contact.phone.replace(/[^+\d]/g, '')}`} className="min-h-12 px-3 py-3 rounded-xl font-bold flex items-center justify-center gap-2 border hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}>
-                <Phone className="w-4 h-4 text-sky-500" /><span>Llamar</span>
+                <Phone className="w-3.5 h-3.5 text-sky-500 shrink-0" /><span>Llamar</span>
               </a>
             )}
             <button onClick={() => downloadVCard(restaurant)} className="min-h-12 px-3 py-3 rounded-xl font-bold flex items-center justify-center gap-2 border hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}>
-              <ContactRound className="w-4 h-4 text-indigo-500" /><span>Guardar contacto</span>
+              <ContactRound className="w-3.5 h-3.5 text-indigo-500 shrink-0" /><span>Guardar contacto</span>
             </button>
             {features.tableReservations && contact.whatsapp && (
-              <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, quisiera reservar una mesa. ¿Me comparten disponibilidad?`)}`} target="_blank" rel="noopener noreferrer" className="min-h-12 px-3 py-3 rounded-xl font-bold flex items-center justify-center gap-2 border border-amber-400/40 bg-amber-500/10 text-amber-700 hover:-translate-y-0.5 hover:shadow-md transition-all">
-                <Calendar className="w-4 h-4" /><span>Reservar mesa</span>
+              <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, quisiera reservar una mesa. ¿Me comparten disponibilidad?`)}`} target="_blank" rel="noopener noreferrer" className="min-h-10 min-w-0 px-2 py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 border border-amber-400/40 bg-amber-500/10 text-amber-700 text-[11px] leading-tight hover:brightness-95 active:scale-[.98] transition-all">
+                <Calendar className="w-3.5 h-3.5 shrink-0" /><span>Reservar mesa</span>
               </a>
             )}
           </div>
