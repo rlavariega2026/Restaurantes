@@ -52,7 +52,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
       if (res.ok) {
         const data = await res.json();
         if (data.init_point) {
-          setPreferenceUrl(data.init_point);
+          setPreferenceUrl(config.sandboxMode ? (data.sandbox_init_point || data.init_point) : data.init_point);
           return;
         }
       }
@@ -178,15 +178,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
 
-                  {config.sandboxMode && (
-                    <button
-                      type="button"
-                      onClick={handleSimulateTestPayment}
-                      className="w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium text-xs transition-colors"
-                    >
-                      Probar Confirmación Sandbox (Simulador de Prueba)
-                    </button>
-                  )}
+                  {config.sandboxMode && <p className="text-[11px] text-slate-500 text-center">Completa el pago con una cuenta y tarjeta de prueba de Mercado Pago para verificar el resultado real.</p>}
                 </div>
               ) : (
                 <button
