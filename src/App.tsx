@@ -323,6 +323,7 @@ export default function App() {
         config={currentRestaurant.mercadoPagoConfig}
         orderTotal={orderTotalForModal || cartTotal || 350}
         restaurantName={currentRestaurant.name}
+        restaurantSlug={currentRestaurant.slug}
         onPaymentSuccess={(paymentId) => {
           alert(`¡Pago con Mercado Pago aprobado exitosamente! ID de referencia: ${paymentId}`);
           handleClearCart();

@@ -8,6 +8,7 @@ interface MercadoPagoModalProps {
   config: MercadoPagoConfig;
   orderTotal: number;
   restaurantName: string;
+  restaurantSlug: string;
   orderId?: string;
   onPaymentSuccess?: (paymentId: string) => void;
 }
@@ -18,6 +19,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
   config,
   orderTotal,
   restaurantName,
+  restaurantSlug,
   orderId = 'ORD-' + Math.floor(Math.random() * 89999 + 10000),
   onPaymentSuccess,
 }) => {
@@ -42,6 +44,8 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
           quantity: 1,
           currency_id: config.currency || 'MXN',
           external_reference: orderId,
+          restaurant_slug: restaurantSlug,
+          sandbox_mode: config.sandboxMode,
         }),
       });
 
@@ -58,9 +62,8 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
       setLoading(false);
     }
 
-    // If sandbox / demo credentials or backend unavailable, provide direct gateway link
-    const sandboxUrl = `https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=demo_${orderId}`;
-    setPreferenceUrl(sandboxUrl);
+    setPreferenceUrl(null);
+    alert('No se pudo generar una preferencia real de Mercado Pago. Verifica las credenciales y el servidor.');
   };
 
   const handleSimulateTestPayment = () => {

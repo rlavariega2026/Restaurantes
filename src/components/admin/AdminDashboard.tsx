@@ -187,21 +187,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
-  // Load official test credentials for Mercado Pago
   const handleLoadOfficialSandboxCredentials = () => {
-    setForm((prev) => ({
-      ...prev,
-      mercadoPagoConfig: {
-        ...prev.mercadoPagoConfig,
-        publicKey: 'TEST-39482109-7b31-482a-9cf1-884920194820',
-        accessToken: 'TEST-7281920381920381-029102-test-token-checkout-pro-official-2025',
-        sandboxMode: true,
-        currency: prev.mercadoPagoConfig?.currency || 'MXN',
-        verified: true,
-      },
-    }));
-    setMpFeedback('¡Credenciales oficiales de prueba (Sandbox) cargadas correctamente!');
-    setTimeout(() => setMpFeedback(null), 3500);
+    setForm((prev) => ({ ...prev, mercadoPagoConfig: { ...prev.mercadoPagoConfig, sandboxMode: true, currency: prev.mercadoPagoConfig?.currency || 'MXN', verified: false } }));
+    setMpFeedback('Sandbox activado. Introduce tus credenciales TEST reales de Mercado Pago.');
+    setTimeout(() => setMpFeedback(null), 5000);
   };
 
   // Open Save Modal (either update existing or create as new card)
@@ -1602,6 +1591,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
                 </div>
 
+                <div className="space-y-3 pt-4 border-t border-slate-200">
+                  <div><h4 className="text-sm font-bold text-slate-900">Redes Sociales y enlaces</h4><p className="text-xs text-slate-500">Agrega el enlace completo de cada perfil; solo se mostrarán los que configures.</p></div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {([['instagram','Instagram','https://instagram.com/tuusuario'],['facebook','Facebook','https://facebook.com/tupagina'],['tiktok','TikTok','https://tiktok.com/@tuusuario'],['youtube','YouTube','https://youtube.com/@tucanal'],['messenger','Messenger','https://m.me/tuusuario'],['telegram','Telegram','https://t.me/tuusuario'],['pinterest','Pinterest','https://pinterest.com/tuusuario'],['website','Sitio web','https://tusitio.com'],['rappi','Rappi','Enlace de tu restaurante'],['ubereats','Uber Eats','Enlace de tu restaurante']] as const).map(([key,label,placeholder]) => (
+                      <label key={key} className="block"><span className="text-xs font-bold text-slate-700 block mb-1">{label}</span><input type="url" value={(form.socialLinks as any)?.[key] || ''} onChange={(e) => setForm({...form,socialLinks:{...form.socialLinks,[key]:e.target.value}})} placeholder={placeholder} className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg" /></label>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Day-by-Day Schedule */}
                 <div className="space-y-3 pt-4 border-t border-slate-200">
                   <h4 className="text-sm font-bold text-slate-900">Horarios de Apertura Día por Día</h4>
@@ -2638,8 +2636,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   {saveLoading
                     ? 'Guardando...'
                     : saveActionType === 'create_new'
-                    ? 'Crear y Publicar Nueva Tarjeta'
-                    : 'Confirmar y Guardar Cambios'}
+                    ? 'Guardar como'
+                    : 'Guardar cambios'}
                 </span>
               </button>
             </div>

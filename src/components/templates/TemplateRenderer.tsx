@@ -283,11 +283,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
           {/* Overlaid Editorial Text Cluster */}
           <div
             className={`relative z-30 px-6 max-w-xl mx-auto w-full transition-all ${
-              heroContentPosition === 'top'
-                ? 'pt-4 pb-auto'
-                : heroContentPosition === 'center'
-                ? 'my-auto text-center'
-                : 'mt-auto pb-4 text-left'
+              heroContentPosition === 'top' ? 'mt-4 mb-auto text-left' : heroContentPosition === 'center' ? 'my-auto text-center' : 'mt-auto mb-4 text-left'
             }`}
           >
             <div className="space-y-2">
@@ -1070,7 +1066,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 
                   <button
                     type="button"
-                    onClick={onOpenBankTransfer}
+                    onClick={() => downloadVCard(restaurant)}
                     className="py-2 px-3 rounded-xl font-bold text-xs border flex items-center justify-center gap-1.5 hover:opacity-90 transition-all"
                     style={{
                       borderColor: `${branding.textColor}30`,
@@ -1078,7 +1074,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                     }}
                   >
                     <Building2 className="w-3.5 h-3.5" />
-                    <span>Ficha Completa</span>
+                    <span>Guardar Ficha</span>
                   </button>
                 </div>
               </div>
@@ -1150,34 +1146,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
           <p>{contact.city} {contact.postalCode ? `· C.P. ${contact.postalCode}` : ''}</p>
         </div>
 
-        {/* LAV Digital MKT Signature */}
-        <div className="pt-4 border-t border-slate-500/20 text-[11px] opacity-60">
-          <p>
-            Tarjeta Digital Inteligente desarrollada por{' '}
-            <strong className="tracking-wide">LAV Digital MKT</strong>
-          </p>
-          <p className="text-[10px] mt-0.5">lavdigitalmkt.com · Marketing Gastronómico</p>
-        </div>
       </footer>
-
-      {/* 8. FLOATING STICKY BOTTOM CART TRIGGER (When cart has items) */}
-      {cartCount > 0 && (
-        <div className="fixed bottom-4 left-4 right-4 z-40 max-w-md mx-auto">
-          <button
-            onClick={onOpenCart}
-            style={{ backgroundColor: branding.accentColor }}
-            className="w-full py-3.5 px-5 text-white font-bold rounded-2xl shadow-xl flex items-center justify-between active:scale-[0.98] transition-all"
-          >
-            <div className="flex items-center gap-2.5">
-              <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-extrabold tabular-nums">
-                {cartCount}
-              </span>
-              <span className="text-xs uppercase tracking-wider font-extrabold">Ver Mi Pedido</span>
-            </div>
-            <span className="text-sm font-extrabold tabular-nums">${cartTotal} MXN</span>
-          </button>
-        </div>
-      )}
 
       {/* Lightbox Modal for Gallery Photo Expansion */}
       {selectedGalleryPhoto && (

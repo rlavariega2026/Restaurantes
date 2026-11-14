@@ -61,21 +61,11 @@ export class RestaurantService {
       list.push(updated);
     }
 
-    // Save to local storage first
-    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(list));
-
-    // Also attempt backend persist
-    try {
-      await fetch(`/api/restaurants/${restaurant.slug}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updated),
-      });
-    } catch {
-      // Backend sync error ignored, local copy saved
-    }
-
-    return updated;
+    const response = await fetch('/api/restaurants', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(list) });
+    if (!response.ok) { const detail = await response.json().catch(() => ({})); throw new Error(detail.error || 'No se pudo guardar en el servidor.'); }
+    const persisted = await response.json() as Restaurant[];
+    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(persisted));
+    return persisted.find((item) => item.id === updated.id) || updated;
   }
 
   // Save as a brand new restaurant / template card with user-assigned names and slug
@@ -125,20 +115,12 @@ export class RestaurantService {
     };
 
     list.unshift(newRestaurant);
-    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(list));
+    const response = await fetch('/api/restaurants', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(list) });
+    if (!response.ok) { const detail = await response.json().catch(() => ({})); throw new Error(detail.error || 'No se pudo guardar como nueva tarjeta.'); }
+    const persisted = await response.json() as Restaurant[];
+    localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(persisted));
     localStorage.setItem(STORAGE_KEY_ACTIVE_SLUG, finalSlug);
-
-    try {
-      await fetch('/api/restaurants', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newRestaurant),
-      });
-    } catch {
-      // local copy preserved
-    }
-
-    return newRestaurant;
+    return persisted.find((item) => item.slug === finalSlug) || newRestaurant;
   }
 
   // Duplicate restaurant

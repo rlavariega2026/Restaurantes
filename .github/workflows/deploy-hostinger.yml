@@ -37,6 +37,9 @@ jobs:
       - name: Verify build output
         run: test -s dist/index.html
 
+      - name: Validate PHP API syntax
+        run: php -l public/api.php
+
       - name: Deploy only dist to the Restaurantes directory
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
