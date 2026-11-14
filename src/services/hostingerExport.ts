@@ -4,6 +4,16 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
   const { branding, contact, socialLinks, features, schedule, categories, products, bankDetails } = restaurant;
 
   const serializedData = JSON.stringify(restaurant).replace(/</g, '\\u003c');
+  const orderSettings = restaurant.ordering || { enabled: true, destination: 'whatsapp', buttonLabel: 'Agregar al pedido' };
+  const orderingEnabled = orderSettings.enabled !== false && orderSettings.destination !== 'disabled' && (orderSettings.destination === 'custom_url' || features.whatsappOrders || features.pickupOrders || features.deliveryOrders);
+  const orderButtonLabel = orderSettings.buttonLabel || 'Agregar al pedido';
+  const design = branding.buttonDesign || {};
+  const buttonBackground = design.variant === 'outline' ? 'transparent' : (design.backgroundColor || branding.accentColor || '#D6A85F');
+  const buttonTextColor = design.textColor || (design.variant === 'outline' ? branding.textColor : '#101827');
+  const buttonBorder = design.borderColor || branding.accentColor || '#D6A85F';
+  const buttonFont = design.fontFamily || 'Plus Jakarta Sans';
+  const buttonFontSize = design.fontSize === 'small' ? '11px' : design.fontSize === 'large' ? '15px' : '13px';
+  const buttonAlign = design.alignment || 'center';
 
   return `<!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
@@ -39,12 +49,38 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
     .font-oswald { font-family: 'Oswald', sans-serif; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .category-list{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+    .cat-pill{border:1px solid \${branding.textColor}30;color:\${branding.textColor};background:\${branding.surfaceColor};padding:10px 16px;border-radius:999px;font-size:12px;font-weight:700;white-space:normal;transition:.2s}
+    .cat-pill.active{background:\${branding.accentColor};color:#101827;border-color:\${branding.accentColor};box-shadow:0 6px 20px \${branding.accentColor}35}
+    .products-grid{display:grid;grid-template-columns:1fr;gap:22px}
+    .product-card{overflow:hidden;border-radius:22px;background:\${branding.surfaceColor};border:1px solid \${branding.textColor}16;box-shadow:0 12px 35px rgba(0,0,0,.10)}
+    .product-photo{width:100%;aspect-ratio:16/10;display:block;position:relative;overflow:hidden;background:#171b25;cursor:zoom-in}
+    .product-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s}
+    .product-photo:hover img{transform:scale(1.035)}
+    .product-tag{position:absolute;left:14px;top:14px;background:\${branding.accentColor};color:#101827;border-radius:999px;padding:6px 10px;font-size:10px;font-weight:800}
+    .product-tag-secondary{left:auto;right:14px;background:rgba(15,23,42,.82);color:white}
+    .product-copy{padding:17px}.product-copy h3{font-size:16px;line-height:1.3;font-weight:800}
+    .product-price{color:\${branding.accentColor};white-space:nowrap;font-size:16px;font-weight:900}.product-price small{font-size:9px;opacity:.7}
+    .product-copy p{opacity:.68;font-size:12px;line-height:1.65;margin-top:8px}
+    .product-add,.checkout-button{display:flex;align-items:center;justify-content:center;width:100%;margin-top:15px;padding:12px 16px;border-radius:16px;color:\${buttonTextColor};background:\${buttonBackground};border:1px solid \${buttonBorder};font-family:'\${buttonFont}',sans-serif;font-size:\${buttonFontSize};font-weight:800;text-align:\${buttonAlign};transition:transform .2s}
+    .product-unavailable{display:inline-flex;margin-top:12px;font-size:11px;opacity:.55}
+    .cart-fab{position:fixed;z-index:60;bottom:18px;left:50%;transform:translateX(-50%);width:min(92vw,520px);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-radius:999px;color:\${buttonTextColor};background:\${buttonBackground};border:1px solid \${buttonBorder};box-shadow:0 15px 40px rgba(0,0,0,.35);font-family:'\${buttonFont}',sans-serif;font-weight:800}
+    .cart-count{min-width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:rgba(0,0,0,.18);font-size:11px}
+    .cart-panel{position:absolute;top:0;right:0;height:100%;width:min(100%,520px);padding:22px;display:flex;flex-direction:column;background:\${branding.bgColor};color:\${branding.textColor};box-shadow:-20px 0 60px rgba(0,0,0,.35)}
+    .cart-close{width:38px;height:38px;border-radius:50%;background:\${branding.surfaceColor};font-size:24px}
+    .cart-line{display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;background:\${branding.surfaceColor}}
+    .cart-line img{width:64px;height:64px;border-radius:12px;object-fit:cover}
+    .cart-qty{display:flex;align-items:center;gap:10px;padding:5px 9px;border-radius:999px;background:\${branding.bgColor};font-size:12px;font-weight:800}
+    .cart-qty button{width:24px;height:24px;border-radius:50%;background:\${branding.surfaceColor}}
+    .checkout-button{margin-top:0;padding:15px}.checkout-button:disabled{opacity:.4;cursor:not-allowed}
+    @media(min-width:700px){.products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}}
+    @media(max-width:420px){.product-copy{padding:14px}.product-copy h3{font-size:14px}.product-price{font-size:14px}.cat-pill{padding:9px 13px}.cart-panel{padding:17px}}
   </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start pb-24">
 
   <!-- Central Mobile Container -->
-  <div class="w-full max-w-md min-h-screen relative shadow-2xl flex flex-col" style="background-color: ${branding.bgColor};">
+  <div class="w-full max-w-5xl min-h-screen relative shadow-2xl flex flex-col" style="background-color: ${branding.bgColor};">
 
     <!-- HERO COVER -->
     <header class="relative w-full overflow-hidden ${restaurant.templateId === 'portada-inmersiva' ? 'h-[100dvh]' : 'h-72'} bg-slate-900">
@@ -178,53 +214,48 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
     ` : ''}
 
     <!-- MENU DIGITAL INTERACTIVO -->
-    <main class="px-4 py-4 space-y-4 flex-1">
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-xl font-black tracking-tight">Menú Digital</h2>
-          <p class="text-xs opacity-70">Explora nuestros platillos y bebidas preparadas al momento</p>
+    <main id="menu-section" class="w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-10 flex-1">
+      <div class="max-w-5xl mx-auto">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-5">
+          <div><span class="text-[10px] uppercase tracking-[.24em] font-bold opacity-60">Nuestra cocina</span><h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">Menú digital</h2><p class="text-sm opacity-65 mt-1">Descubre cada platillo y sus ingredientes</p></div>
+          <input id="menu-search" type="search" placeholder="Buscar en el menú..." class="w-full sm:w-64 rounded-full px-4 py-2.5 text-sm outline-none border" style="background:\${branding.surfaceColor};border-color:\${branding.textColor}25;color:\${branding.textColor}">
         </div>
-      </div>
-
-      <!-- Categories Pills -->
-      <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
-        <button onclick="filterCategory('all', this)" class="cat-pill active px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-amber-500 text-slate-950">
-          Todos (${products.length})
-        </button>
-        ${categories.map((c) => `
-          <button onclick="filterCategory('${c.id}', this)" class="cat-pill px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border" style="border-color: ${branding.textColor}30; color: ${branding.textColor};">
-            ${c.name}
-          </button>
-        `).join('')}
-      </div>
-
-      <!-- Products Grid -->
-      <div id="products-container" class="space-y-3">
-        ${products.map((p) => `
-          <div class="product-card p-3 rounded-2xl border flex gap-3 items-center" data-category="${p.categoryId}" style="background-color: ${branding.surfaceColor}; border-color: ${branding.textColor}1A;">
-            <div class="w-20 h-20 rounded-xl overflow-hidden bg-slate-800 shrink-0">
-              <img src="${p.imageUrl || 'https://images.unsplash.com/photo-1544025162-d76694265947?w=300&q=80'}" alt="${p.name}" class="w-full h-full object-cover">
-            </div>
-            <div class="flex-1 min-w-0">
-              <h3 class="font-bold text-xs leading-tight">${p.name}</h3>
-              <p class="text-[11px] opacity-70 line-clamp-2 mt-0.5">${p.description}</p>
-              <div class="flex items-center justify-between mt-2">
-                <span class="font-extrabold text-xs text-amber-400 tabular-nums">$${p.price} MXN</span>
-                <a href="https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent('Hola ' + restaurant.name + ', quisiera pedir: ' + p.name + ' ($' + p.price + ' MXN)')}" target="_blank" class="px-2.5 py-1 rounded-lg text-[10px] font-bold text-slate-950 bg-amber-500 hover:bg-amber-400">
-                  Pedir
-                </a>
+        <div class="category-list mb-6">
+          <button onclick="filterCategory('all',this)" class="cat-pill active">Todos (\${products.length})</button>
+          \${categories.map((c) => \`<button onclick="filterCategory('\${c.id}',this)" class="cat-pill">\${c.name}</button>\`).join('')}
+        </div>
+        <div id="products-container" class="products-grid">
+          \${products.map((p) => \`
+            <article class="product-card" data-category="\${p.categoryId}" data-name="\${(p.name || '').toLowerCase()}" data-description="\${(p.description || '').toLowerCase()}">
+              <button type="button" class="product-photo" onclick="openProductPhoto('\${p.id}')" aria-label="Ampliar fotografía de \${p.name}">
+                <img src="\${p.imageUrl || 'https://images.unsplash.com/photo-1544025162-d76694265947?w=900&q=85'}" alt="\${p.name}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1544025162-d76694265947?w=900&q=85'">
+                \${(p.tags || []).includes('nuevo') ? '<span class="product-tag">Nuevo</span>' : ''}
+                \${(p.tags || []).includes('favorito') ? '<span class="product-tag product-tag-secondary">Favorito</span>' : ''}
+              </button>
+              <div class="product-copy"><div class="flex items-start justify-between gap-3"><h3>\${p.name}</h3><span class="product-price">$ \${p.price} <small>MXN</small></span></div><p>\${p.description || ''}</p>
+                \${p.available ? (orderingEnabled ? \`<button type="button" class="product-add" onclick="addToCart('\${p.id}')">\${orderButtonLabel}</button>\` : '') : '<span class="product-unavailable">Por el momento no disponible</span>'}
               </div>
-            </div>
-          </div>
-        `).join('')}
+            </article>
+          \`).join('')}
+        </div>
+        <p id="menu-empty" class="hidden text-center py-12 opacity-60 text-sm">No encontramos platillos con esa búsqueda.</p>
       </div>
     </main>
-
+    <div id="photo-lightbox" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/95 p-4" onclick="closeProductPhoto()"><button class="absolute top-4 right-4 text-white text-3xl" aria-label="Cerrar">×</button><img id="photo-lightbox-image" class="max-h-[90vh] max-w-[95vw] object-contain rounded-xl" alt="Fotografía del platillo"></div>
+    \${orderingEnabled ? \`
+    <button id="cart-fab" type="button" onclick="openCart()" class="cart-fab"><span>Mi pedido</span><span id="cart-count" class="cart-count">0</span><strong id="cart-total">$0 MXN</strong></button>
+    <div id="cart-drawer" class="fixed inset-0 z-[80] hidden">
+      <button class="absolute inset-0 bg-black/65 backdrop-blur-sm" onclick="closeCart()" aria-label="Cerrar pedido"></button>
+      <section class="cart-panel"><header class="flex items-center justify-between border-b pb-4" style="border-color:\${branding.textColor}20"><div><span class="text-[10px] uppercase tracking-widest opacity-60">Tu selección</span><h2 class="text-xl font-extrabold">Mi pedido</h2></div><button onclick="closeCart()" class="cart-close" aria-label="Cerrar">×</button></header>
+        <div id="cart-items" class="flex-1 overflow-y-auto py-4 space-y-3"><p class="text-sm opacity-60 text-center py-10">Todavía no agregas platillos.</p></div>
+        <footer class="border-t pt-4 space-y-3" style="border-color:\${branding.textColor}20"><div class="flex justify-between text-sm"><span class="opacity-70">Subtotal</span><strong id="cart-subtotal">$0 MXN</strong></div><div class="flex justify-between text-lg font-extrabold"><span>Total</span><strong id="cart-total-panel">$0 MXN</strong></div><button id="checkout-button" onclick="sendOrder()" class="checkout-button" disabled>Continuar con mi pedido</button><p class="text-[10px] opacity-55 text-center">Confirma disponibilidad y costo final con el restaurante.</p></footer>
+      </section>
+    </div>\` : ''}
     <!-- FOOTER -->
     <footer class="p-6 border-t text-center space-y-2 text-xs" style="background-color: ${branding.surfaceColor}; border-color: ${branding.textColor}15;">
       <p class="font-bold text-sm">${restaurant.name}</p>
       <p class="opacity-70">${contact.address}</p>
-      <p class="text-[10px] opacity-50 pt-2">Diseñado con tecnología LAV Digital MKT · Tarjeta Digital Gastronómica</p>
+      
     </footer>
 
   </div>
@@ -265,21 +296,27 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
       });
     }
 
-    // Category filter
-    function filterCategory(catId, btn) {
-      document.querySelectorAll('.cat-pill').forEach(b => {
-        b.classList.remove('bg-amber-500', 'text-slate-950');
-      });
-      btn.classList.add('bg-amber-500', 'text-slate-950');
-
-      document.querySelectorAll('.product-card').forEach(card => {
-        if (catId === 'all' || card.getAttribute('data-category') === catId) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    }
+    const menuProducts = \${JSON.stringify(products).replace(/</g, '\\u003c')};
+    const orderConfig = \${JSON.stringify(orderSettings).replace(/</g, '\\u003c')};
+    const cart = new Map();
+    const money = value => '  </script>
+</body>
+</html>`;
+}
+ + Number(value || 0).toLocaleString('es-MX',{maximumFractionDigits:2}) + ' MXN';
+    function filterCategory(catId,btn){document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.product-card').forEach(card=>card.style.display=(catId==='all'||card.dataset.category===catId)?'':'none');updateEmptyState();}
+    function addToCart(id){const product=menuProducts.find(p=>p.id===id);if(!product||!product.available)return;const item=cart.get(id)||{product,quantity:0};item.quantity++;cart.set(id,item);renderCart();}
+    function changeQuantity(id,delta){const item=cart.get(id);if(!item)return;item.quantity+=delta;if(item.quantity<=0)cart.delete(id);renderCart();}
+    function renderCart(){const rows=[...cart.values()],count=rows.reduce((s,i)=>s+i.quantity,0),total=rows.reduce((s,i)=>s+i.quantity*Number(i.product.price||0),0);const c=document.getElementById('cart-count'),t=document.getElementById('cart-total'),sub=document.getElementById('cart-subtotal'),pt=document.getElementById('cart-total-panel');if(c)c.textContent=String(count);if(t)t.textContent=money(total);if(sub)sub.textContent=money(total);if(pt)pt.textContent=money(total);const box=document.getElementById('cart-items'),go=document.getElementById('checkout-button');if(box)box.innerHTML=rows.length?rows.map(({product,quantity})=>'<div class="cart-line"><img src="'+(product.imageUrl||'')+'" alt=""><div class="min-w-0 flex-1"><strong class="block text-sm">'+escapeText(product.name)+'</strong><span class="text-xs opacity-65">'+money(product.price)+'</span><div class="cart-qty mt-2"><button onclick="changeQuantity(\\''+product.id+'\\',-1)">−</button><span>'+quantity+'</span><button onclick="changeQuantity(\\''+product.id+'\\',1)">+</button></div></div><strong class="text-sm">'+money(quantity*Number(product.price||0))+'</strong></div>').join(''):'<p class="text-sm opacity-60 text-center py-10">Todavía no agregas platillos.</p>';if(go)go.disabled=!rows.length;}
+    function escapeText(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+    function openCart(){document.getElementById('cart-drawer')?.classList.remove('hidden');}
+    function closeCart(){document.getElementById('cart-drawer')?.classList.add('hidden');}
+    function sendOrder(){const rows=[...cart.values()];if(!rows.length)return;const total=rows.reduce((s,i)=>s+i.quantity*Number(i.product.price||0),0);const lines=rows.map(({product,quantity})=>quantity+' x '+product.name+' — '+money(quantity*Number(product.price||0)));const summary=['Pedido para \${restaurant.name}',...lines,'Total: '+money(total)].join('\\n');if(orderConfig.destination==='custom_url'&&orderConfig.customUrl){try{const target=new URL(orderConfig.customUrl);target.searchParams.set('pedido',summary);window.location.href=target.toString();}catch{alert('La URL de destino no es válida.');}return;}const phone='\${contact.whatsapp.replace(/\\D/g, '')}';if(!phone){alert('El restaurante no ha configurado su WhatsApp.');return;}window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(summary),'_blank','noopener');}
+    function openProductPhoto(id){const p=menuProducts.find(x=>x.id===id);if(!p||!p.imageUrl)return;const box=document.getElementById('photo-lightbox');document.getElementById('photo-lightbox-image').src=p.imageUrl;box.classList.remove('hidden');box.classList.add('flex');}
+    function closeProductPhoto(){const box=document.getElementById('photo-lightbox');box.classList.add('hidden');box.classList.remove('flex');}
+    function updateEmptyState(){const shown=[...document.querySelectorAll('.product-card')].some(c=>c.style.display!=='none');document.getElementById('menu-empty')?.classList.toggle('hidden',shown);}
+    document.getElementById('menu-search')?.addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();document.querySelectorAll('.product-card').forEach(c=>c.style.display=(c.dataset.name+' '+c.dataset.description).includes(q)?'':'none');updateEmptyState();});
+    renderCart();
   </script>
 </body>
 </html>`;
