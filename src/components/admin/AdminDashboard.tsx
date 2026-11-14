@@ -199,26 +199,16 @@ const RESTAURANTES_API = '/Restaurantes/api';
       const saved = await RestaurantService.saveRestaurant(form);
       setForm(saved);
       onUpdateRestaurant(saved);
-      const response = await fetch(`${RESTAURANTES_API}/mercadopago/create-preference`, {
+      const response = await fetch(`${RESTAURANTES_API}/mercadopago/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: 'Prueba de conexión · ' + saved.name,
-          price: 10,
-          quantity: 1,
-          currency_id: saved.mercadoPagoConfig.currency || 'MXN',
-          external_reference: 'TEST-' + Date.now(),
-          restaurant_slug: saved.slug,
-          sandbox_mode: saved.mercadoPagoConfig.sandboxMode,
-        }),
+        body: JSON.stringify({ restaurant_slug: saved.slug }),
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Mercado Pago no aceptó las credenciales.');
-      const checkoutUrl = saved.mercadoPagoConfig.sandboxMode
-        ? (result.sandbox_init_point || result.init_point)
-        : result.init_point;
-      if (!checkoutUrl) throw new Error('Mercado Pago no devolvió un enlace de Checkout Pro.');
-      window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.error || result.detail || 'Mercado Pago no aceptó las credenciales.');
+      setForm((prev) => ({ ...prev, mercadoPagoConfig: { ...prev.mercadoPagoConfig, verified: true } }));
+      setMpFeedback(`Conexión verificada con Mercado Pago${result.account?.nickname ? ` · ${result.account.nickname}` : ''}. No se realizó ningún cobro.`);
+      setTimeout(() => setMpFeedback(null), 6000);
     } catch (error) {
       alert(error instanceof Error ? error.message : 'No se pudo comprobar la conexión con Mercado Pago.');
     }
@@ -1851,7 +1841,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
                     </div>
                   )}
 
-                  {/* Quick Action Helpers: Load Test Credentials & Test Live Simulation */}
+                  {/* Herramientas de conexión de Mercado Pago */}
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
@@ -1859,7 +1849,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
                       className="py-1.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                      <span>Cargar credenciales de prueba oficiales (Sandbox)</span>
+                      <span>Activar modo Sandbox</span>
                     </button>
 
                     <button
