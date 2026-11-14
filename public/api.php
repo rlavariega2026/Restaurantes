@@ -2,7 +2,7 @@
 declare(strict_types=1);
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, no-cache, must-revalidate');
-$dir=dirname(__DIR__,2).'/.restaurantes-data';
+$dir=dirname(__DIR__).'/.restaurantes-data';
 if(!is_dir($dir)&&!mkdir($dir,0750,true)&&!is_dir($dir)){http_response_code(500);echo json_encode(['error'=>'No se pudo crear almacenamiento']);exit;}
 function readData($file){$v=file_exists($file)?json_decode((string)file_get_contents($file),true):[];return is_array($v)?$v:[];}
 function writeData($file,$v){$tmp=$file.'.tmp';return file_put_contents($tmp,json_encode($v,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),LOCK_EX)!==false&&rename($tmp,$file);}
@@ -10,6 +10,7 @@ function safeRest($r){if(isset($r['mercadoPagoConfig']))$r['mercadoPagoConfig'][
 function reply($v,$code=200){http_response_code($code);echo json_encode($v,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);exit;}
 $rf=$dir.'/restaurants.json';$of=$dir.'/orders.json';$restaurants=readData($rf);$orders=readData($of);
 $method=$_SERVER['REQUEST_METHOD']??'GET';$path=parse_url($_SERVER['REQUEST_URI']??'/',PHP_URL_PATH)?:'/';$path=preg_replace('#^/Restaurantes#i','',$path);$path=rtrim($path,'/')?:'/';$body=json_decode((string)file_get_contents('php://input'),true)?:[];
+if($path==='/api/health'&&$method==='GET')reply(['success'=>true,'storage_writable'=>is_writable($dir),'api'=>'restaurantes-v2']);
 if($path==='/api/restaurants'&&$method==='GET')reply(array_map('safeRest',$restaurants));
 if($path==='/api/restaurants'&&$method==='POST'){if(empty($body['slug'])||empty($body['name']))reply(['error'=>'Nombre y slug obligatorios'],400);foreach($restaurants as $r)if(($r['slug']??'')===($body['slug']??''))reply(['error'=>'El slug ya existe'],409);$restaurants[]=$body;if(!writeData($rf,$restaurants))reply(['error'=>'No se pudo crear restaurante'],500);reply(safeRest($body),201);}
 if(preg_match('#^/api/restaurants/([^/]+)$#',$path,$m)&&$method==='DELETE'){$slug=rawurldecode($m[1]);$filtered=array_values(array_filter($restaurants,fn($r)=>($r['slug']??'')!==$slug&&($r['id']??'')!==$slug));if(!writeData($rf,$filtered))reply(['error'=>'No se pudo eliminar restaurante'],500);reply(['success'=>true]);}
