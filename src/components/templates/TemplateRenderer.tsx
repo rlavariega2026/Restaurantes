@@ -72,6 +72,18 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 
   const { branding, contact, socialLinks, features, schedule, categories, products } = restaurant;
 
+  const socialHref = (value?: string, platform?: string) => {
+    if (!value) return '';
+    const raw = value.trim();
+    if (/^https?:\/\//i.test(raw)) return raw;
+    const clean = raw.replace(/^@/, '');
+    const bases: Record<string, string> = {
+      instagram: 'https://instagram.com/', facebook: 'https://facebook.com/',
+      tiktok: 'https://tiktok.com/@', youtube: 'https://youtube.com/@',
+    };
+    return (bases[platform || ''] || 'https://') + clean;
+  };
+
   // Filtered products
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
@@ -409,19 +421,11 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
           {/* Quick Action Button Strip (Call, Maps, Reviews, WhatsApp) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-1 text-xs">
             {/* WhatsApp */}
-            <a
-              href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, te contacto desde tu tarjeta digital.`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`py-2.5 px-3 font-semibold flex items-center justify-center gap-2 shadow-2xs transition-all ${getButtonRadiusClass()}`}
-              style={{
-                backgroundColor: branding.accentColor,
-                color: '#FFFFFF',
-              }}
-            >
-              <MessageCircle className="w-4 h-4 fill-current" />
-              <span>WhatsApp</span>
-            </a>
+            {features.whatsappOrders && contact.whatsapp && (
+              <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, te contacto desde tu tarjeta digital.`)}`} target="_blank" rel="noopener noreferrer" className={`py-2.5 px-3 font-semibold flex items-center justify-center gap-2 shadow-2xs transition-all ${getButtonRadiusClass()}`} style={{backgroundColor: branding.accentColor,color:'#FFFFFF'}}>
+                <MessageCircle className="w-4 h-4 fill-current" /><span>WhatsApp</span>
+              </a>
+            )}
 
             {/* Google Maps / Dirección */}
             <a
@@ -1104,28 +1108,10 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
               <MessageCircle className="w-4 h-4 fill-current" />
             </a>
           )}
-          {socialLinks.instagram && (
-            <a
-              href={`https://instagram.com/${socialLinks.instagram}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-              className="p-2.5 rounded-full bg-pink-500/10 text-pink-600 hover:scale-110 transition-transform"
-            >
-              <Instagram className="w-4 h-4" />
-            </a>
-          )}
-          {socialLinks.facebook && (
-            <a
-              href={`https://facebook.com/${socialLinks.facebook}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Facebook"
-              className="p-2.5 rounded-full bg-blue-500/10 text-blue-600 hover:scale-110 transition-transform"
-            >
-              <Facebook className="w-4 h-4 fill-current" />
-            </a>
-          )}
+          {socialLinks.instagram && <a href={socialHref(socialLinks.instagram,'instagram')} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="p-2.5 rounded-full bg-pink-500/10 text-pink-600 hover:scale-110 transition-transform"><Instagram className="w-4 h-4" /></a>}
+          {socialLinks.facebook && <a href={socialHref(socialLinks.facebook,'facebook')} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="p-2.5 rounded-full bg-blue-500/10 text-blue-600 hover:scale-110 transition-transform"><Facebook className="w-4 h-4" /></a>}
+          {socialLinks.tiktok && <a href={socialHref(socialLinks.tiktok,'tiktok')} target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="p-2.5 rounded-full bg-slate-900/10 hover:scale-110 transition-transform"><Music2 className="w-4 h-4" /></a>}
+          {socialLinks.youtube && <a href={socialHref(socialLinks.youtube,'youtube')} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="p-2.5 rounded-full bg-red-500/10 text-red-600 hover:scale-110 transition-transform"><Youtube className="w-4 h-4" /></a>}
           {socialLinks.website && (
             <a
               href={socialLinks.website}

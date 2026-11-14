@@ -26,7 +26,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onOpenBankTransfer,
   onOpenMercadoPago,
 }) => {
-  const [orderType, setOrderType] = useState<'pickup' | 'delivery' | 'dine_in'>('pickup');
+  const [orderType, setOrderType] = useState<'pickup' | 'delivery' | 'dine_in'>(restaurant.features.pickupOrders ? 'pickup' : restaurant.features.deliveryOrders ? 'delivery' : 'dine_in');
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
@@ -246,7 +246,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     Modalidad de Entrega
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    <button
+                    {restaurant.features.pickupOrders && (<button
                       type="button"
                       onClick={() => setOrderType('pickup')}
                       className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all ${
@@ -257,8 +257,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     >
                       <Store className="w-4 h-4" />
                       <span>Para Recoger</span>
-                    </button>
-                    <button
+                    </button>)}
+                    {restaurant.features.deliveryOrders && (<button
                       type="button"
                       onClick={() => setOrderType('delivery')}
                       className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all ${
@@ -269,8 +269,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     >
                       <MapPin className="w-4 h-4" />
                       <span>A Domicilio</span>
-                    </button>
-                    <button
+                    </button>)}
+                    {restaurant.features.tableReservations && (<button
                       type="button"
                       onClick={() => setOrderType('dine_in')}
                       className={`p-2.5 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all ${
@@ -281,7 +281,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     >
                       <Building2 className="w-4 h-4" />
                       <span>En Mesa</span>
-                    </button>
+                    </button>)}
                   </div>
                 </div>
 
@@ -384,7 +384,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               {/* Action Buttons */}
               <div className="space-y-2 pt-1">
                 {/* 1. Pedir por WhatsApp */}
-                <button
+                {restaurant.features.whatsappOrders && (<button
                   type="button"
                   onClick={handleWhatsAppOrder}
                   disabled={isSubmitting}
@@ -393,7 +393,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <MessageCircle className="w-4 h-4 fill-current" />
                   <span>Enviar Pedido por WhatsApp</span>
                   <ArrowRight className="w-4 h-4 ml-auto" />
-                </button>
+                </button>)}
 
                 {/* 2. Transferencia Bancaria */}
                 {restaurant.features.bankTransfer && (
