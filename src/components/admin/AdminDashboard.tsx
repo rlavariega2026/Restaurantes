@@ -197,7 +197,8 @@ const RESTAURANTES_API = '/Restaurantes/api';
   const handleTestMercadoPagoConnection = async () => {
     try {
       const saved = await RestaurantService.saveRestaurant(form);
-      setForm(saved);
+      // The API intentionally never returns the private token. Preserve the value typed in this editor.
+      setForm({ ...saved, mercadoPagoConfig: { ...saved.mercadoPagoConfig, accessToken: form.mercadoPagoConfig.accessToken } });
       onUpdateRestaurant(saved);
       const response = await fetch(`${RESTAURANTES_API}/mercadopago/verify`, {
         method: 'POST',
@@ -206,7 +207,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success) throw new Error(result.error || result.detail || 'Mercado Pago no aceptó las credenciales.');
-      setForm((prev) => ({ ...prev, mercadoPagoConfig: { ...prev.mercadoPagoConfig, verified: true } }));
+      setForm((prev) => ({ ...prev, mercadoPagoConfig: { ...prev.mercadoPagoConfig, accessToken: form.mercadoPagoConfig.accessToken, verified: true } }));
       setMpFeedback(`Conexión verificada con Mercado Pago${result.account?.nickname ? ` · ${result.account.nickname}` : ''}. No se realizó ningún cobro.`);
       setTimeout(() => setMpFeedback(null), 6000);
     } catch (error) {
