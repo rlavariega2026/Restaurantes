@@ -10,6 +10,10 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
   const orderSettingsJson = JSON.stringify(orderSettings);
   const restaurantNameJson = JSON.stringify(restaurant.name);
   const whatsappPhoneJson = JSON.stringify(contact.whatsapp.replace(/\D/g, ''));
+  const design = branding.buttonDesign || {};
+  const buttonBackground = design.variant === 'outline' ? 'transparent' : (design.backgroundColor || branding.accentColor || '#D6A85F');
+  const buttonTextColor = design.textColor || (design.variant === 'outline' ? branding.textColor : '#101827');
+  const buttonBorder = design.borderColor || branding.accentColor || '#D6A85F';
 
   return `<!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
