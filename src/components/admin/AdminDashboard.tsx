@@ -2473,8 +2473,8 @@ const RESTAURANTES_API = '/Restaurantes/api';
                 <div>
                   <h4 className="text-sm font-bold">
                     {saveActionType === 'create_new'
-                      ? 'Guardar como Nueva Tarjeta / Plantilla'
-                      : 'Guardar Cambios y Publicar'}
+                      ? 'Guardar como'
+                      : 'Guardar cambios'}
                   </h4>
                   <span className="text-[10px] text-slate-400 block">
                     Personaliza el nombre de tu tarjeta, plantilla y enlace público
@@ -2510,7 +2510,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
                 }`}
               >
                 <Save className="w-3.5 h-3.5" />
-                <span>Actualizar esta Tarjeta</span>
+                <span>Guardar cambios</span>
               </button>
 
               <button
