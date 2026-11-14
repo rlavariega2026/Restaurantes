@@ -35,7 +35,7 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
     setLoading(true);
     try {
       // Call backend preference endpoint
-      const res = await fetch('/api/mercadopago/create-preference', {
+      const res = await fetch('/Restaurantes/api/mercadopago/create-preference', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -49,21 +49,18 @@ export const MercadoPagoModal: React.FC<MercadoPagoModalProps> = ({
         }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.init_point) {
-          setPreferenceUrl(config.sandboxMode ? (data.sandbox_init_point || data.init_point) : data.init_point);
-          return;
-        }
-      }
-    } catch {
-      // Backend preference creation
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || data.detail || `Mercado Pago respondió HTTP ${res.status}.`);
+      if (!data.init_point) throw new Error('Mercado Pago no devolvió el enlace de pago.');
+      setPreferenceUrl(config.sandboxMode ? (data.sandbox_init_point || data.init_point) : data.init_point);
+      return;
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'No se pudo conectar con Mercado Pago.');
     } finally {
       setLoading(false);
     }
 
     setPreferenceUrl(null);
-    alert('No se pudo generar una preferencia real de Mercado Pago. Verifica las credenciales y el servidor.');
   };
 
   const handleSimulateTestPayment = () => {
