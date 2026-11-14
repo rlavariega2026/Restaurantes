@@ -28,6 +28,8 @@ import {
   Facebook,
   Youtube,
   Music2,
+  Send,
+  Pin,
   ContactRound,
   ListFilter,
   Radio,
@@ -474,6 +476,11 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
               {socialLinks.tiktok && <a href={socialHref(socialLinks.tiktok, 'tiktok')} target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><Music2 className="w-4 h-4" /></a>}
               {socialLinks.youtube && <a href={socialHref(socialLinks.youtube, 'youtube')} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><Youtube className="w-4 h-4" /></a>}
               {socialLinks.website && <a href={socialHref(socialLinks.website)} target="_blank" rel="noopener noreferrer" aria-label="Sitio web" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><Globe className="w-4 h-4" /></a>}
+              {socialLinks.messenger && <a href={socialHref(socialLinks.messenger)} target="_blank" rel="noopener noreferrer" aria-label="Messenger" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><MessageCircle className="w-4 h-4" /></a>}
+              {socialLinks.telegram && <a href={socialHref(socialLinks.telegram)} target="_blank" rel="noopener noreferrer" aria-label="Telegram" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><Send className="w-4 h-4" /></a>}
+              {socialLinks.pinterest && <a href={socialHref(socialLinks.pinterest)} target="_blank" rel="noopener noreferrer" aria-label="Pinterest" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><Pin className="w-4 h-4" /></a>}
+              {socialLinks.rappi && <a href={socialHref(socialLinks.rappi)} target="_blank" rel="noopener noreferrer" aria-label="Rappi" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><ShoppingBag className="w-4 h-4" /></a>}
+              {socialLinks.ubereats && <a href={socialHref(socialLinks.ubereats)} target="_blank" rel="noopener noreferrer" aria-label="Uber Eats" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><Utensils className="w-4 h-4" /></a>}
             </div>
           )}
 
