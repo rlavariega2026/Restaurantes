@@ -79,6 +79,19 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
   };
 
   const { branding, contact, socialLinks, features, schedule, categories, products } = restaurant;
+  const buttonDesign = branding.buttonDesign || {};
+  const configuredButtonStyle: React.CSSProperties = {
+    backgroundColor: buttonDesign.variant === 'outline' ? 'transparent' : buttonDesign.variant === 'glass' ? 'rgba(255,255,255,.16)' : buttonDesign.variant === 'soft' ? `${branding.accentColor}25` : (buttonDesign.backgroundColor || branding.accentColor),
+    color: buttonDesign.textColor || (buttonDesign.variant === 'outline' ? branding.textColor : '#111827'),
+    borderColor: buttonDesign.borderColor || branding.accentColor,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderRadius: buttonDesign.radius === 'pill' ? '9999px' : buttonDesign.radius === 'soft' ? '9px' : '16px',
+    fontFamily: buttonDesign.fontFamily || 'Plus Jakarta Sans',
+    fontSize: buttonDesign.fontSize === 'small' ? '11px' : buttonDesign.fontSize === 'large' ? '15px' : '13px',
+    textAlign: buttonDesign.alignment || 'center',
+    justifyContent: buttonDesign.alignment === 'left' ? 'flex-start' : buttonDesign.alignment === 'right' ? 'flex-end' : 'center',
+  };
   const orderingEnabled = restaurant.ordering?.enabled !== false && restaurant.ordering?.destination !== 'disabled' && (restaurant.ordering?.destination === 'custom_url' || features.whatsappOrders || features.pickupOrders || features.deliveryOrders);
   const handleQuickAdd = (product: MenuItem) => {
     if (!orderingEnabled || !product.available) return;
@@ -350,7 +363,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                 {heroButtons.showOrderBtn && orderingEnabled && (
                   <button
                     onClick={onOpenCart}
-                    className="min-w-0 px-3 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold text-[11px] leading-tight backdrop-blur-md border border-white/25 active:scale-[.98] transition-all flex items-center justify-center gap-1.5"
+                    className="min-w-0 px-3 py-2 font-bold text-[11px] leading-tight backdrop-blur-md active:scale-[.98] transition-all flex items-center gap-1.5" style={configuredButtonStyle}
                   >
                     <ShoppingBag className="w-3.5 h-3.5" />
                     <span>Pedir Ahora</span>
@@ -764,7 +777,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                       ${product.price} MXN
                     </span>
                     {orderingEnabled && (
-                      <button type="button" onClick={(event) => { event.stopPropagation(); handleQuickAdd(product); }} disabled={!product.available} className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-extrabold shadow-sm transition-all hover:-translate-y-0.5 disabled:opacity-40" style={{ backgroundColor: branding.accentColor, color: '#111827' }}>
+                      <button type="button" onClick={(event) => { event.stopPropagation(); handleQuickAdd(product); }} disabled={!product.available} className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-extrabold shadow-sm transition-all hover:-translate-y-0.5 disabled:opacity-40" style={configuredButtonStyle}>
                         <ShoppingBag className="w-3.5 h-3.5" />
                         {product.variants?.length || product.extras?.length ? 'Elegir opciones' : 'Agregar'}
                       </button>
