@@ -263,6 +263,7 @@ export default function App() {
             <TemplateRenderer
               restaurant={currentRestaurant}
               onOpenProduct={(prod) => setSelectedProduct(prod)}
+              onAddToCart={handleAddToCart}
               onOpenCart={() => setIsCartOpen(true)}
               onOpenShare={() => setIsShareOpen(true)}
               onOpenQr={() => setIsQrOpen(true)}

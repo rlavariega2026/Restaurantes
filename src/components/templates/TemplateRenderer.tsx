@@ -43,6 +43,7 @@ import { downloadVCard } from '../../services/storage';
 interface TemplateRendererProps {
   restaurant: Restaurant;
   onOpenProduct: (product: MenuItem) => void;
+  onAddToCart: (item: CartItem) => void;
   onOpenCart: () => void;
   onOpenShare: () => void;
   onOpenQr: () => void;
@@ -54,6 +55,7 @@ interface TemplateRendererProps {
 export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
   restaurant,
   onOpenProduct,
+  onAddToCart,
   onOpenCart,
   onOpenShare,
   onOpenQr,
@@ -77,6 +79,14 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
   };
 
   const { branding, contact, socialLinks, features, schedule, categories, products } = restaurant;
+  const orderingEnabled = restaurant.ordering?.enabled !== false && restaurant.ordering?.destination !== 'disabled' && (restaurant.ordering?.destination === 'custom_url' || features.whatsappOrders || features.pickupOrders || features.deliveryOrders);
+  const handleQuickAdd = (product: MenuItem) => {
+    if (!orderingEnabled || !product.available) return;
+    if ((product.variants?.length || 0) > 0 || (product.extras?.length || 0) > 0) { onOpenProduct(product); return; }
+    onAddToCart({ product, quantity: 1, itemTotal: product.price });
+    onOpenCart();
+  };
+
 
   const socialHref = (value?: string, platform?: string) => {
     if (!value) return '';
@@ -337,7 +347,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                   </button>
                 )}
 
-                {heroButtons.showOrderBtn && (features.whatsappOrders || features.pickupOrders || features.deliveryOrders) && (
+                {heroButtons.showOrderBtn && orderingEnabled && (
                   <button
                     onClick={onOpenCart}
                     className="min-w-0 px-3 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold text-[11px] leading-tight backdrop-blur-md border border-white/25 active:scale-[.98] transition-all flex items-center justify-center gap-1.5"
@@ -721,14 +731,14 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
               <div
                 key={product.id}
                 onClick={() => onOpenProduct(product)}
-                className="group p-3.5 rounded-2xl border transition-all cursor-pointer flex gap-3.5 hover:shadow-md active:scale-[0.99]"
+                className="group p-0 rounded-3xl border transition-all cursor-pointer flex flex-col overflow-hidden hover:shadow-xl active:scale-[0.99]"
                 style={{
                   backgroundColor: branding.surfaceColor,
                   borderColor: `${branding.textColor}1A`,
                 }}
               >
                 {/* Product Info */}
-                <div className="flex-1 flex flex-col justify-between min-w-0">
+                <div className="flex-1 flex flex-col justify-between min-w-0 p-4">
                   <div className="space-y-1">
                     {/* Tags row */}
                     {product.tags && product.tags.length > 0 && (
@@ -753,26 +763,23 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                     <span className="text-sm font-extrabold tabular-nums">
                       ${product.price} MXN
                     </span>
-                    <span
-                      className="px-2 py-0.5 rounded text-[11px] font-bold transition-transform group-hover:scale-105"
-                      style={{
-                        backgroundColor: `${branding.accentColor}25`,
-                        color: branding.accentColor,
-                      }}
-                    >
-                      + Pedir
-                    </span>
+                    {orderingEnabled && (
+                      <button type="button" onClick={(event) => { event.stopPropagation(); handleQuickAdd(product); }} disabled={!product.available} className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-[11px] font-extrabold shadow-sm transition-all hover:-translate-y-0.5 disabled:opacity-40" style={{ backgroundColor: branding.accentColor, color: '#111827' }}>
+                        <ShoppingBag className="w-3.5 h-3.5" />
+                        {product.variants?.length || product.extras?.length ? 'Elegir opciones' : 'Agregar'}
+                      </button>
+                    )}
                   </div>
                 </div>
 
                 {/* Product Thumbnail */}
-                <div className="w-24 h-24 rounded-xl overflow-hidden bg-slate-100 shrink-0 relative">
+                <div className="w-full aspect-[16/10] overflow-hidden bg-slate-100 shrink-0 relative">
                   {product.imageUrl ? (
                     <img
                       src={product.imageUrl}
                       alt={product.name}
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-400 bg-slate-200/50">
@@ -792,6 +799,12 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
           </div>
         )}
       </section>
+
+      {orderingEnabled && cartCount > 0 && (
+        <button type="button" onClick={onOpenCart} className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 rounded-full px-5 py-3 shadow-2xl border border-white/20 backdrop-blur-xl text-sm font-extrabold active:scale-95 transition-all" style={{backgroundColor:branding.accentColor,color:'#111827'}}>
+          <ShoppingBag className="w-4 h-4" /><span>Mi pedido</span><span className="rounded-full bg-black/15 px-2 py-1 text-xs">{cartCount}</span><span className="tabular-nums">${cartTotal.toLocaleString('es-MX')} MXN</span>
+        </button>
+      )}
 
       {/* 5. PHOTO GALLERY & AMBIENCE (If enabled) */}
       {features.photoGallery && branding.gallery && branding.gallery.length > 0 && (
