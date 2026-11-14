@@ -49,6 +49,8 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
     .font-oswald { font-family: 'Oswald', sans-serif; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .hero-cta{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:10px 17px;border-radius:999px;background:${buttonBackground};color:${buttonTextColor};border:1px solid ${buttonBorder};font-family:'${buttonFont}',sans-serif;font-size:${buttonFontSize};font-weight:800;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+    .hero-cta-secondary{background:rgba(15,23,42,.55);color:#fff;border-color:rgba(255,255,255,.28);backdrop-filter:blur(10px)}
     .category-list{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
     .cat-pill{border:1px solid \${branding.textColor}30;color:\${branding.textColor};background:\${branding.surfaceColor};padding:10px 16px;border-radius:999px;font-size:12px;font-weight:700;white-space:normal;transition:.2s}
     .cat-pill.active{background:\${branding.accentColor};color:#101827;border-color:\${branding.accentColor};box-shadow:0 6px 20px \${branding.accentColor}35}
@@ -64,6 +66,7 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
     .product-copy p{opacity:.68;font-size:12px;line-height:1.65;margin-top:8px}
     .product-add,.checkout-button{display:flex;align-items:center;justify-content:center;width:100%;margin-top:15px;padding:12px 16px;border-radius:16px;color:\${buttonTextColor};background:\${buttonBackground};border:1px solid \${buttonBorder};font-family:'\${buttonFont}',sans-serif;font-size:\${buttonFontSize};font-weight:800;text-align:\${buttonAlign};transition:transform .2s}
     .product-unavailable{display:inline-flex;margin-top:12px;font-size:11px;opacity:.55}
+    .social-link{width:38px;height:38px;display:grid;place-items:center;border:1px solid ${branding.textColor}25;border-radius:50%;font-weight:900;font-size:16px;transition:.2s}.social-link:hover{transform:translateY(-2px);background:${branding.accentColor};color:#101827}
     .cart-fab{position:fixed;z-index:60;bottom:18px;left:50%;transform:translateX(-50%);width:min(92vw,520px);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-radius:999px;color:\${buttonTextColor};background:\${buttonBackground};border:1px solid \${buttonBorder};box-shadow:0 15px 40px rgba(0,0,0,.35);font-family:'\${buttonFont}',sans-serif;font-weight:800}
     .cart-count{min-width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:rgba(0,0,0,.18);font-size:11px}
     .cart-panel{position:absolute;top:0;right:0;height:100%;width:min(100%,520px);padding:22px;display:flex;flex-direction:column;background:\${branding.bgColor};color:\${branding.textColor};box-shadow:-20px 0 60px rgba(0,0,0,.35)}
@@ -105,6 +108,11 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
       <div class="absolute bottom-5 inset-x-5 text-white z-10 space-y-1">
         <h1 class="text-3xl font-black leading-tight tracking-tight">${restaurant.name}</h1>
         <p class="text-xs text-white/90 font-medium line-clamp-2">${restaurant.tagline || ''}</p>
+        <div class="flex flex-wrap gap-2 pt-3">
+          <a href="#menu-section" class="hero-cta hero-cta-secondary">Ver menú</a>
+          ${orderingEnabled ? '<button type="button" onclick="openCart()" class="hero-cta">Pedir ahora</button>' : ''}
+          ${features.tableReservations && contact.whatsapp ? '<a href="https://wa.me/' + contact.whatsapp.replace(/\\D/g, '') + '?text=' + encodeURIComponent('Hola ' + restaurant.name + ', quisiera reservar una mesa.') + '" target="_blank" rel="noopener" class="hero-cta hero-cta-secondary">Reservar</a>' : ''}
+        </div>
       </div>
     </header>
 
@@ -254,6 +262,13 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
     <!-- FOOTER -->
     <footer class="p-6 border-t text-center space-y-2 text-xs" style="background-color: ${branding.surfaceColor}; border-color: ${branding.textColor}15;">
       <p class="font-bold text-sm">${restaurant.name}</p>
+      <div class="flex flex-wrap justify-center gap-2 py-2">
+        ${socialLinks.instagram ? '<a class="social-link" href="' + (socialLinks.instagram.startsWith('http') ? socialLinks.instagram : 'https://instagram.com/' + socialLinks.instagram.replace(/^@/,'')) + '" target="_blank" rel="noopener" aria-label="Instagram">◎</a>' : ''}
+        ${socialLinks.facebook ? '<a class="social-link" href="' + (socialLinks.facebook.startsWith('http') ? socialLinks.facebook : 'https://facebook.com/' + socialLinks.facebook.replace(/^@/,'')) + '" target="_blank" rel="noopener" aria-label="Facebook">f</a>' : ''}
+        ${socialLinks.tiktok ? '<a class="social-link" href="' + (socialLinks.tiktok.startsWith('http') ? socialLinks.tiktok : 'https://tiktok.com/@' + socialLinks.tiktok.replace(/^@/,'')) + '" target="_blank" rel="noopener" aria-label="TikTok">♪</a>' : ''}
+        ${socialLinks.youtube ? '<a class="social-link" href="' + (socialLinks.youtube.startsWith('http') ? socialLinks.youtube : 'https://youtube.com/@' + socialLinks.youtube.replace(/^@/,'')) + '" target="_blank" rel="noopener" aria-label="YouTube">▶</a>' : ''}
+        ${socialLinks.website ? '<a class="social-link" href="' + (socialLinks.website.startsWith('http') ? socialLinks.website : 'https://' + socialLinks.website) + '" target="_blank" rel="noopener" aria-label="Sitio web">↗</a>' : ''}
+      </div>
       <p class="opacity-70">${contact.address}</p>
       
     </footer>
