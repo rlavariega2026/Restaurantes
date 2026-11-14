@@ -66,7 +66,8 @@ export class RestaurantService {
     if (!response.ok) { const detail = await response.json().catch(() => ({})); throw new Error(detail.error || 'No se pudo guardar en el servidor.'); }
     const persisted = await response.json() as Restaurant[];
     localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(persisted));
-    return persisted.find((item) => item.id === updated.id) || updated;
+    const saved = persisted.find((item) => item.id === updated.id) || updated;
+    return { ...saved, mercadoPagoConfig: { ...saved.mercadoPagoConfig, accessToken: restaurant.mercadoPagoConfig.accessToken } };
   }
 
   // Save as a brand new restaurant / template card with user-assigned names and slug
@@ -121,7 +122,7 @@ export class RestaurantService {
     const updatedList = [persisted, ...list.filter((item) => item.slug !== finalSlug)];
     localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(updatedList));
     localStorage.setItem(STORAGE_KEY_ACTIVE_SLUG, finalSlug);
-    return persisted;
+    return { ...persisted, mercadoPagoConfig: { ...persisted.mercadoPagoConfig, accessToken: newRestaurant.mercadoPagoConfig.accessToken } };
   }
 
   // Duplicate restaurant
