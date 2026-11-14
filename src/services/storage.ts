@@ -6,13 +6,24 @@ const STORAGE_KEY_ORDERS = 'lav_restaurantes_orders_v1';
 const STORAGE_KEY_ACTIVE_SLUG = 'lav_active_restaurant_slug';
 const API_BASE = '/Restaurantes/api';
 
+async function apiJson<T>(response: Response): Promise<T> {
+  const raw = await response.text();
+  let data: any = null;
+  try { data = raw ? JSON.parse(raw) : null; } catch { /* include response details below */ }
+  if (!response.ok) {
+    throw new Error(data?.error || data?.detail || `Error HTTP ${response.status}: ${raw.slice(0, 180) || response.statusText}`);
+  }
+  if (data === null) throw new Error('El servidor no devolvió una respuesta JSON válida.');
+  return data as T;
+}
+
 export class RestaurantService {
   // Load all restaurants
   static async getRestaurants(): Promise<Restaurant[]> {
     try {
       const res = await fetch(`${API_BASE}/restaurants`);
       if (res.ok) {
-        const data = await res.json();
+        const data = await apiJson<Restaurant[]>(res);
         if (Array.isArray(data) && data.length > 0) {
           localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(data));
           return data;
@@ -63,8 +74,8 @@ export class RestaurantService {
     }
 
     const response = await fetch(`${API_BASE}/restaurants`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(list) });
-    if (!response.ok) { const detail = await response.json().catch(() => ({})); throw new Error(detail.error || 'No se pudo guardar en el servidor.'); }
-    const persisted = await response.json() as Restaurant[];
+    const persisted = await apiJson<Restaurant[]>(response);
+    if (!Array.isArray(persisted)) throw new Error('El servidor no confirmó el guardado de la tarjeta.');
     localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(persisted));
     const saved = persisted.find((item) => item.id === updated.id) || updated;
     return { ...saved, mercadoPagoConfig: { ...saved.mercadoPagoConfig, accessToken: restaurant.mercadoPagoConfig.accessToken } };
@@ -117,8 +128,7 @@ export class RestaurantService {
     };
 
     const response = await fetch(`${API_BASE}/restaurants`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newRestaurant) });
-    if (!response.ok) { const detail = await response.json().catch(() => ({})); throw new Error(detail.error || 'No se pudo guardar como nueva tarjeta.'); }
-    const persisted = await response.json() as Restaurant;
+    const persisted = await apiJson<Restaurant>(response);
     const updatedList = [persisted, ...list.filter((item) => item.slug !== finalSlug)];
     localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(updatedList));
     localStorage.setItem(STORAGE_KEY_ACTIVE_SLUG, finalSlug);
@@ -157,8 +167,7 @@ export class RestaurantService {
     };
 
     const response = await fetch(`${API_BASE}/restaurants`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newRestaurant) });
-    if (!response.ok) { const detail = await response.json().catch(() => ({})); throw new Error(detail.error || 'No se pudo duplicar el restaurante.'); }
-    const persisted = await response.json() as Restaurant;
+    const persisted = await apiJson<Restaurant>(response);
     localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify([persisted, ...list]));
     return persisted;
   }
@@ -167,7 +176,7 @@ export class RestaurantService {
   static async deleteRestaurant(idOrSlug: string): Promise<void> {
     const list = await this.getRestaurants();
     const response = await fetch(`${API_BASE}/restaurants/${encodeURIComponent(idOrSlug)}`, { method: 'DELETE' });
-    if (!response.ok) { const detail = await response.json().catch(() => ({})); throw new Error(detail.error || 'No se pudo eliminar el restaurante.'); }
+    await apiJson<{success:boolean}>(response);
     const filtered = list.filter((r) => r.id !== idOrSlug && r.slug !== idOrSlug);
     localStorage.setItem(STORAGE_KEY_RESTAURANTS, JSON.stringify(filtered));
   }
