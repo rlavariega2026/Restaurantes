@@ -279,12 +279,7 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
     const restaurantName = ${restaurantNameJson};
     const whatsappPhone = ${whatsappPhoneJson};
     const cart = {};
-    function money(v){return '    function filterCategory(catId, btn) { document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('bg-amber-500','text-slate-950')); btn.classList.add('bg-amber-500','text-slate-950'); document.querySelectorAll('.product-card').forEach(card=>{card.style.display=(catId==='all'||card.getAttribute('data-category')===catId)?'flex':'none';}); }
-  </script>
-</body>
-</html>`;
-}
-+Number(v||0).toLocaleString('es-MX')+' MXN';}
+    function money(v){return '$'+Number(v||0).toLocaleString('es-MX')+' MXN';}
     function addToCart(id){const p=menuProducts.find(x=>x.id===id);if(!p||!p.available)return;if(!cart[id])cart[id]={product:p,quantity:0};cart[id].quantity++;renderCart();openCart();}
     function changeQuantity(id,delta){if(!cart[id])return;cart[id].quantity+=delta;if(cart[id].quantity<=0)delete cart[id];renderCart();}
     function renderCart(){const rows=Object.values(cart),count=rows.reduce((s,x)=>s+x.quantity,0),total=rows.reduce((s,x)=>s+x.quantity*Number(x.product.price||0),0);const c=document.getElementById('cart-count'),t=document.getElementById('cart-total'),pt=document.getElementById('cart-total-panel');if(c)c.textContent=count;if(t)t.textContent=money(total);if(pt)pt.textContent=money(total);const box=document.getElementById('cart-items');if(box)box.innerHTML=rows.map(x=>'<div class="flex items-center justify-between gap-3 rounded-xl bg-slate-100 p-3"><div class="min-w-0"><b class="text-sm">'+x.product.name+'</b><p class="text-xs text-slate-500">'+money(x.product.price)+'</p><div class="flex items-center gap-3 mt-2"><button onclick="changeQuantity(\''+x.product.id+'\',-1)">−</button><b>'+x.quantity+'</b><button onclick="changeQuantity(\''+x.product.id+'\',1)">+</button></div></div><b>'+money(x.quantity*x.product.price)+'</b></div>').join('')||'<p class="text-sm text-slate-500 text-center py-8">Tu pedido está vacío.</p>';const go=document.getElementById('checkout-button');if(go)go.disabled=!rows.length;}
@@ -293,20 +288,7 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
     function sendOrder(){const rows=Object.values(cart);if(!rows.length)return;const total=rows.reduce((s,x)=>s+x.quantity*Number(x.product.price||0),0);const message=['Pedido para '+restaurantName,...rows.map(x=>x.quantity+' x '+x.product.name+' — '+money(x.quantity*x.product.price)),'Total: '+money(total)].join('\n');if(orderConfig.destination==='custom_url'&&orderConfig.customUrl){const u=new URL(orderConfig.customUrl);u.searchParams.set('pedido',message);window.location.href=u.toString();return;}if(!whatsappPhone){alert('Falta configurar el WhatsApp del restaurante.');return;}window.open('https://wa.me/'+whatsappPhone+'?text='+encodeURIComponent(message),'_blank');}
     renderCart();
     // Category filter
-    function filterCategory(catId, btn) {
-      document.querySelectorAll('.cat-pill').forEach(b => {
-        b.classList.remove('bg-amber-500', 'text-slate-950');
-      });
-      btn.classList.add('bg-amber-500', 'text-slate-950');
-
-      document.querySelectorAll('.product-card').forEach(card => {
-        if (catId === 'all' || card.getAttribute('data-category') === catId) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    }
+    function filterCategory(catId, btn) { document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('bg-amber-500','text-slate-950')); btn.classList.add('bg-amber-500','text-slate-950'); document.querySelectorAll('.product-card').forEach(card=>{card.style.display=(catId==='all'||card.getAttribute('data-category')===catId)?'flex':'none';}); }
   </script>
 </body>
 </html>`;
