@@ -26,6 +26,10 @@ import {
   Globe,
   Instagram,
   Facebook,
+  Youtube,
+  Music2,
+  ContactRound,
+  ListFilter,
   Radio,
   Copy,
   Check,
@@ -326,7 +330,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                   </button>
                 )}
 
-                {heroButtons.showOrderBtn && (
+                {heroButtons.showOrderBtn && (features.whatsappOrders || features.pickupOrders || features.deliveryOrders) && (
                   <button
                     onClick={() => scrollToSection('menu-section')}
                     className="py-2.5 px-4 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs backdrop-blur-md border border-white/25 active:scale-95 transition-all flex items-center gap-1.5"
@@ -336,7 +340,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                   </button>
                 )}
 
-                {heroButtons.showReserveBtn && features.tableReservations && (
+                {heroButtons.showReserveBtn && features.tableReservations && contact.whatsapp && (
                   <a
                     href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, quisiera consultar disponibilidad para reservar una mesa.`)}`}
                     target="_blank"
@@ -418,58 +422,31 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
             {restaurant.description}
           </p>
 
-          {/* Quick Action Button Strip (Call, Maps, Reviews, WhatsApp) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-1 text-xs">
-            {/* WhatsApp */}
+          {/* Quick Action Button Strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 pt-1 text-xs">
             {features.whatsappOrders && contact.whatsapp && (
-              <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, te contacto desde tu tarjeta digital.`)}`} target="_blank" rel="noopener noreferrer" className={`py-2.5 px-3 font-semibold flex items-center justify-center gap-2 shadow-2xs transition-all ${getButtonRadiusClass()}`} style={{backgroundColor: branding.accentColor,color:'#FFFFFF'}}>
-                <MessageCircle className="w-4 h-4 fill-current" /><span>WhatsApp</span>
+              <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, te contacto desde tu tarjeta digital.`)}`} target="_blank" rel="noopener noreferrer" className="min-h-12 px-3 py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-white shadow-sm hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 transition-all" style={{background: 'linear-gradient(135deg, #16a34a, #047857)'}}>
+                <MessageCircle className="w-4 h-4" /><span>WhatsApp</span>
               </a>
             )}
-
-            {/* Google Maps / Dirección */}
-            <a
-              href={contact.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(contact.googleMapsQuery || contact.address)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`py-2.5 px-3 font-semibold border flex items-center justify-center gap-2 hover:opacity-90 transition-all ${getButtonRadiusClass()}`}
-              style={{
-                borderColor: `${branding.textColor}33`,
-                backgroundColor: `${branding.bgColor}80`,
-                color: branding.textColor,
-              }}
-            >
-              <MapPin className="w-4 h-4 text-rose-500" />
-              <span>Cómo Llegar</span>
-            </a>
-
-            {/* Call */}
-            <a
-              href={`tel:${contact.phone.replace(/\s+/g, '')}`}
-              className={`py-2.5 px-3 font-semibold border flex items-center justify-center gap-2 hover:opacity-90 transition-all ${getButtonRadiusClass()}`}
-              style={{
-                borderColor: `${branding.textColor}33`,
-                backgroundColor: `${branding.bgColor}80`,
-                color: branding.textColor,
-              }}
-            >
-              <Phone className="w-4 h-4 text-emerald-500" />
-              <span>Llamar</span>
-            </a>
-
-            {/* Save Contact vCard */}
-            <button
-              onClick={() => downloadVCard(restaurant)}
-              className={`py-2.5 px-3 font-semibold border flex items-center justify-center gap-2 hover:opacity-90 transition-all ${getButtonRadiusClass()}`}
-              style={{
-                borderColor: `${branding.textColor}33`,
-                backgroundColor: `${branding.bgColor}80`,
-                color: branding.textColor,
-              }}
-            >
-              <Download className="w-4 h-4 text-blue-500" />
-              <span>Guardar Ficha</span>
+            {(contact.googleMapsUrl || contact.googleMapsQuery || contact.address) && (
+              <a href={contact.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(contact.googleMapsQuery || contact.address)}`} target="_blank" rel="noopener noreferrer" className="min-h-12 px-3 py-3 rounded-xl font-bold flex items-center justify-center gap-2 border hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}>
+                <MapPin className="w-4 h-4 text-rose-500" /><span>Cómo llegar</span>
+              </a>
+            )}
+            {contact.phone && (
+              <a href={`tel:${contact.phone.replace(/[^+\d]/g, '')}`} className="min-h-12 px-3 py-3 rounded-xl font-bold flex items-center justify-center gap-2 border hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}>
+                <Phone className="w-4 h-4 text-sky-500" /><span>Llamar</span>
+              </a>
+            )}
+            <button onClick={() => downloadVCard(restaurant)} className="min-h-12 px-3 py-3 rounded-xl font-bold flex items-center justify-center gap-2 border hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}>
+              <ContactRound className="w-4 h-4 text-indigo-500" /><span>Guardar contacto</span>
             </button>
+            {features.tableReservations && contact.whatsapp && (
+              <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, quisiera reservar una mesa. ¿Me comparten disponibilidad?`)}`} target="_blank" rel="noopener noreferrer" className="min-h-12 px-3 py-3 rounded-xl font-bold flex items-center justify-center gap-2 border border-amber-400/40 bg-amber-500/10 text-amber-700 hover:-translate-y-0.5 hover:shadow-md transition-all">
+                <Calendar className="w-4 h-4" /><span>Reservar mesa</span>
+              </a>
+            )}
           </div>
 
           {/* Google Reviews Button */}
@@ -487,6 +464,16 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                 </div>
                 <ExternalLink className="w-3.5 h-3.5 text-amber-600" />
               </a>
+            </div>
+          )}
+
+          {features.socialLinks && (
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              {socialLinks.instagram && <a href={socialHref(socialLinks.instagram, 'instagram')} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><Instagram className="w-4 h-4" /></a>}
+              {socialLinks.facebook && <a href={socialHref(socialLinks.facebook, 'facebook')} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><Facebook className="w-4 h-4" /></a>}
+              {socialLinks.tiktok && <a href={socialHref(socialLinks.tiktok, 'tiktok')} target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><Music2 className="w-4 h-4" /></a>}
+              {socialLinks.youtube && <a href={socialHref(socialLinks.youtube, 'youtube')} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><Youtube className="w-4 h-4" /></a>}
+              {socialLinks.website && <a href={socialHref(socialLinks.website)} target="_blank" rel="noopener noreferrer" aria-label="Sitio web" className="w-10 h-10 rounded-xl border flex items-center justify-center hover:-translate-y-0.5 hover:shadow-md transition-all" style={{borderColor:`${branding.textColor}22`,backgroundColor:branding.surfaceColor,color:branding.textColor}}><Globe className="w-4 h-4" /></a>}
             </div>
           )}
 
@@ -693,22 +680,16 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 
         {/* Tag Filters (Favorito, Picante, Veg, Nuevo) */}
         <div className="flex items-center gap-1.5 overflow-x-auto text-[11px] pb-1">
-          {['all', 'favorito', 'nuevo', 'chef', 'picante', 'vegetariano'].map((tagKey) => (
-            <button
-              key={tagKey}
-              onClick={() => setSelectedTag(tagKey)}
-              className={`px-2.5 py-1 rounded-md border transition-all ${
-                selectedTag === tagKey
-                  ? 'border-slate-900 bg-slate-900 text-white font-bold'
-                  : 'border-slate-200/50 opacity-70 hover:opacity-100'
-              }`}
-            >
-              {tagKey === 'all' && 'Todos los tipos'}
-              {tagKey === 'favorito' && '❤️ Favoritos'}
-              {tagKey === 'nuevo' && '✨ Nuevos'}
-              {tagKey === 'chef' && '🎖️ Chef'}
-              {tagKey === 'picante' && '🌶️ Picantes'}
-              {tagKey === 'vegetariano' && '🌱 Veganos'}
+          {[
+            { key: 'all', label: 'Todos', icon: <ListFilter className="w-3.5 h-3.5" /> },
+            { key: 'favorito', label: 'Favoritos', icon: <Heart className="w-3.5 h-3.5" /> },
+            { key: 'nuevo', label: 'Nuevos', icon: <Sparkles className="w-3.5 h-3.5" /> },
+            { key: 'chef', label: 'Chef', icon: <Award className="w-3.5 h-3.5" /> },
+            { key: 'picante', label: 'Picantes', icon: <Flame className="w-3.5 h-3.5" /> },
+            { key: 'vegetariano', label: 'Veganos', icon: <Leaf className="w-3.5 h-3.5" /> },
+          ].map((tag) => (
+            <button key={tag.key} onClick={() => setSelectedTag(tag.key)} className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-[11px] font-semibold whitespace-nowrap transition-all ${selectedTag === tag.key ? 'border-slate-900 bg-slate-900 text-white shadow-sm' : 'border-slate-200 bg-white/70 opacity-80 hover:opacity-100 hover:border-slate-400'}`}>
+              {tag.icon}<span>{tag.label}</span>
             </button>
           ))}
         </div>
