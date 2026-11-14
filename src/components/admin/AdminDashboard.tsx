@@ -2367,6 +2367,16 @@ const RESTAURANTES_API = '/Restaurantes/api';
                 />
               </div>
 
+              <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 space-y-3">
+                <h5 className="font-bold text-sm text-indigo-950">Diseño del texto de este platillo</h5>
+                <p className="text-[11px] text-indigo-700">Estos ajustes se guardan con cada platillo y aparecen en el menú publicado.</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="space-y-1">Tipografía<select className="w-full p-2 border rounded-lg" value={editingProduct.textDesign?.fontFamily || 'inherit'} onChange={e=>setEditingProduct({...editingProduct,textDesign:{...editingProduct.textDesign,fontFamily:e.target.value}})}>{['inherit','Plus Jakarta Sans','DM Sans','Outfit','Montserrat','Playfair Display','Oswald'].map(f=><option key={f} value={f}>{f==='inherit'?'Predeterminada':f}</option>)}</select></label>
+                  <label className="space-y-1">Alineación<select className="w-full p-2 border rounded-lg" value={editingProduct.textDesign?.alignment || 'left'} onChange={e=>setEditingProduct({...editingProduct,textDesign:{...editingProduct.textDesign,alignment:e.target.value as 'left'|'center'|'right'}})}><option value="left">Izquierda</option><option value="center">Centro</option><option value="right">Derecha</option></select></label>
+                  {([['nameSize','Nombre',18],['descriptionSize','Descripción',13],['priceSize','Precio',18]] as const).map(([key,label,defaultSize])=><label key={key} className="space-y-1">{label} · tamaño (px)<input className="w-full p-2 border rounded-lg" type="number" min="10" max="42" value={editingProduct.textDesign?.[key] || defaultSize} onChange={e=>setEditingProduct({...editingProduct,textDesign:{...editingProduct.textDesign,[key]:Math.max(10,Math.min(42,Number(e.target.value)||defaultSize))}})}/></label>)}
+                  {([['nameColor','Color del nombre'],['descriptionColor','Color de descripción'],['priceColor','Color del precio']] as const).map(([key,label])=><label key={key} className="flex items-center justify-between gap-2">{label}<input type="color" value={editingProduct.textDesign?.[key] || '#ffffff'} onChange={e=>setEditingProduct({...editingProduct,textDesign:{...editingProduct.textDesign,[key]:e.target.value}})}/></label>)}
+                </div>
+              </div>
               {/* Product Photo Upload from Computer & URL */}
               <div className="space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
                 <label className="font-bold text-slate-800 block">Fotografía del Platillo</label>

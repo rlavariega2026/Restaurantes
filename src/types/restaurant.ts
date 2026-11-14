@@ -48,6 +48,7 @@ export interface MenuItem {
   extras?: ProductExtra[];
   calories?: string;
   prepTime?: string;
+  textDesign?: { fontFamily?: string; nameSize?: number; descriptionSize?: number; priceSize?: number; alignment?: 'left' | 'center' | 'right'; nameColor?: string; descriptionColor?: string; priceColor?: string };
 }
 
 export interface MenuCategory {

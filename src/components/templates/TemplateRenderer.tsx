@@ -80,6 +80,8 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 
   const { branding, contact, socialLinks, features, schedule, categories, products } = restaurant;
   const buttonDesign = branding.buttonDesign || {};
+  const bundledImages = import.meta.glob('/src/assets/images/*', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
+  const resolveImage = (url?: string) => url?.startsWith('/src/assets/images/') ? (bundledImages[url] || '') : (url || '');
   const configuredButtonStyle: React.CSSProperties = {
     backgroundColor: buttonDesign.variant === 'outline' ? 'transparent' : buttonDesign.variant === 'glass' ? 'rgba(255,255,255,.16)' : buttonDesign.variant === 'soft' ? `${branding.accentColor}25` : (buttonDesign.backgroundColor || branding.accentColor),
     color: buttonDesign.textColor || (buttonDesign.variant === 'outline' ? branding.textColor : '#111827'),
@@ -273,7 +275,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
             {heroDisplayMode === 'contain' && (
               /* Ambient blurred duplicate to gracefully fill any aspect ratio */
               <img
-                src={branding.coverUrl || '/src/assets/images/hero_immersive_culinary_1793144478747.jpg'}
+                src={resolveImage(branding.coverUrl || '/src/assets/images/hero_immersive_culinary_1793144478747.jpg')}
                 alt=""
                 aria-hidden="true"
                 referrerPolicy="no-referrer"
@@ -281,7 +283,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
               />
             )}
             <img
-              src={branding.coverUrl || '/src/assets/images/hero_immersive_culinary_1793144478747.jpg'}
+              src={resolveImage(branding.coverUrl || '/src/assets/images/hero_immersive_culinary_1793144478747.jpg')}
               alt={restaurant.name}
               referrerPolicy="no-referrer"
               className={`w-full h-full relative z-10 transition-transform duration-700 ${
@@ -402,7 +404,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
           {/* Main Cover Image */}
           <div className="relative h-64 md:h-80 w-full bg-slate-900 overflow-hidden">
             <img
-              src={branding.coverUrl || '/src/assets/images/hero_culinary_editorial_1793142965729.jpg'}
+              src={resolveImage(branding.coverUrl || '/src/assets/images/hero_culinary_editorial_1793142965729.jpg')}
               alt={restaurant.name}
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
@@ -442,7 +444,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
       {/* CONTINUOUS NATURAL PAGE PRESENTATION */}
       <section
         id="presentation-section"
-        className="restaurant-intro px-5 py-4 border-b space-y-3"
+        className="restaurant-intro px-5 py-4 border-b"
         style={{
           backgroundColor: branding.surfaceColor,
           borderColor: `${branding.textColor}1A`,
@@ -453,7 +455,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
           </p>
 
           {/* Quick Action Button Strip */}
-          <div className="restaurant-action-list flex flex-wrap items-center gap-2 pt-1 text-[11px]">
+          <div className="restaurant-action-list flex flex-wrap items-center gap-2 pt-1 text-[11px] min-w-0">
             {features.whatsappOrders && contact.whatsapp && (
               <a href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${restaurant.name}, te contacto desde tu tarjeta digital.`)}`} target="_blank" rel="noopener noreferrer" className="restaurant-action-button min-h-10 min-w-0 px-4 py-2 rounded-full font-semibold flex items-center justify-center gap-2 text-white text-xs leading-tight shadow-sm hover:brightness-105 active:scale-[.98] transition-all" style={{background: 'linear-gradient(135deg, #16a34a, #047857)'}}>
                 <MessageCircle className="w-3.5 h-3.5 shrink-0" /><span>WhatsApp</span>
@@ -754,7 +756,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                 <div className="menu-product-photo w-full aspect-[16/10] overflow-hidden bg-slate-100 shrink-0 relative">
                   {product.imageUrl ? (
                     <img
-                      src={product.imageUrl}
+                      src={resolveImage(product.imageUrl)}
                       alt={product.name}
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
@@ -774,7 +776,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                 </div>
 
                 {/* Product Info */}
-                <div className="menu-product-info flex-1 flex flex-col justify-between min-w-0 p-4">
+                <div className="menu-product-info flex-1 flex flex-col justify-between min-w-0 p-4" style={{textAlign:product.textDesign?.alignment || "left",fontFamily:product.textDesign?.fontFamily || "inherit"}}>
                   <div className="space-y-1">
                     {/* Tags row */}
                     {product.tags && product.tags.length > 0 && (
@@ -786,17 +788,17 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
                         ))}
                       </div>
                     )}
-                    <h3 className="text-sm font-bold leading-tight group-hover:opacity-90 line-clamp-1">
+                    <h3 className="text-sm font-bold leading-tight group-hover:opacity-90" style={{fontSize:product.textDesign?.nameSize || 18,color:product.textDesign?.nameColor || "inherit",overflowWrap:"anywhere"}}>
                       {product.name}
                     </h3>
-                    <p className="text-xs opacity-75 line-clamp-2 leading-relaxed">
+                    <p className="text-xs opacity-75 leading-relaxed" style={{fontSize:product.textDesign?.descriptionSize || 13,color:product.textDesign?.descriptionColor || "inherit",overflowWrap:"anywhere"}}>
                       {product.description}
                     </p>
                   </div>
 
                   {/* Price & Add Indicator */}
                   <div className="pt-2 flex items-center justify-between">
-                    <span className="text-sm font-extrabold tabular-nums">
+                    <span className="text-sm font-extrabold tabular-nums" style={{fontSize:product.textDesign?.priceSize || 18,color:product.textDesign?.priceColor || "inherit"}}>
                       ${product.price} MXN
                     </span>
                     {orderingEnabled && (
@@ -814,8 +816,8 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
       </section>
 
       {orderingEnabled && cartCount > 0 && (
-        <button type="button" onClick={onOpenCart} className="restaurant-cart-float fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 rounded-full px-5 py-3 shadow-2xl border border-white/20 backdrop-blur-xl text-sm font-extrabold active:scale-95 transition-all" style={{backgroundColor:branding.accentColor,color:'#111827'}}>
-          <ShoppingBag className="w-4 h-4" /><span>Mi pedido</span><span className="rounded-full bg-black/15 px-2 py-1 text-xs">{cartCount}</span><span className="tabular-nums">${cartTotal.toLocaleString('es-MX')} MXN</span>
+        <button type="button" onClick={onOpenCart} className="restaurant-cart-float fixed bottom-4 right-4 z-40 flex items-center gap-3 rounded-full px-5 py-3 shadow-2xl border border-white/20 backdrop-blur-xl text-sm font-extrabold active:scale-95 transition-all" style={{backgroundColor:branding.accentColor,color:'#111827'}}>
+          <ShoppingBag className="w-4 h-4" /><span>Ver pedido ({cartCount})</span>
         </button>
       )}
 
