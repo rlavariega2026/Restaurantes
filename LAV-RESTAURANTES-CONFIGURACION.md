@@ -32,7 +32,7 @@ Antes de cualquier cambio de almacenamiento, verificar físicamente la ruta y pr
 - Las publicaciones se crean bajo `/Restaurantes/<carpeta-cliente>/<carpeta-publicacion>/`; ambas carpetas son reales y deben validarse.
 - Publicar DEMO y Publicar definitiva reutilizan la misma dirección y se distinguen por `hostingerConfig.publicationMode`.
 - DEMO: logotipo original LAV + palabra DEMO + leyenda semitransparente. Definitiva: sin marca de agua.
-- Archivo oficial del logo integrado desde la referencia LAV: `public/lav-logo-original.svg`, servido como `/Restaurantes/lav-logo-original.svg`.
+- Archivo oficial de marca de agua: `LOGO LAV DIGITAL.png`, original del propietario copiado por GitHub Actions desde el activo confirmado de LAV y servido como `/Restaurantes/LOGO%20LAV%20DIGITAL.png`. El workflow comprueba que su contenido público coincide con el archivo desplegado.
 - No borrar ni renombrar proyectos anteriores.
 - Comprobar la publicación real y el funcionamiento de su pantalla completa; no limitarse a la vista previa.
 - API de publicación: `public/lav-publish.php`, requiere sesión y CSRF.
