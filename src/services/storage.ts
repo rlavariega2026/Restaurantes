@@ -13,6 +13,41 @@ export const lavAuthorizedFetch = (input: RequestInfo | URL, init: RequestInit =
 };
 
 
+export async function uploadRestaurantImage(file: File): Promise<string> {
+  if (!file || file.size === 0) throw new Error('La fotografía está vacía.');
+  const chunkSize = 1024 * 1024;
+  const total = Math.ceil(file.size / chunkSize);
+  const uploadId = crypto.randomUUID();
+  for (let index = 0; index < total; index++) {
+    const part = file.slice(index * chunkSize, Math.min((index + 1) * chunkSize, file.size));
+    const body = new FormData();
+    body.append('part', part, file.name);
+    body.append('uploadId', uploadId);
+    body.append('index', String(index));
+    body.append('total', String(total));
+    body.append('size', String(file.size));
+    let lastError = 'Error de transferencia';
+    let completed = false;
+    for (let attempt = 0; attempt < 3 && !completed; attempt++) {
+      try {
+        const response = await lavAuthorizedFetch('/Restaurantes/lav-media.php', { method: 'POST', body });
+        const data = await apiJson<{ success: boolean; url?: string }>(response);
+        if (!data.success) throw new Error('El servidor no confirmó la imagen.');
+        if (index === total - 1) {
+          if (!data.url) throw new Error('Falta el enlace confirmado de la imagen.');
+          return data.url;
+        }
+        completed = true;
+      } catch (error) {
+        lastError = error instanceof Error ? error.message : 'Error de carga';
+        if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 300 * (attempt + 1)));
+      }
+    }
+    if (!completed) throw new Error(lastError);
+  }
+  throw new Error('La imagen no quedó confirmada por el servidor');
+}
+
 async function apiJson<T>(response: Response): Promise<T> {
   const raw = await response.text();
   let data: any = null;
