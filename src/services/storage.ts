@@ -327,7 +327,7 @@ export class OrderService {
     localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(current));
 
     try {
-      await fetch(`${API_BASE}/orders/${encodeURIComponent(orderId)}`, {
+      await lavAuthorizedFetch(`${API_BASE}/orders/${encodeURIComponent(orderId)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderStatus: status }),
