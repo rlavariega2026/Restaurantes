@@ -38,7 +38,7 @@ import {
 import JSZip from 'jszip';
 import { Restaurant, MenuItem, MenuCategory, TemplateId, ProductTag, ButtonStyle, GalleryPhoto } from '../../types/restaurant';
 import { TEMPLATE_DEFINITIONS } from '../../data/templateDefinitions';
-import { RestaurantService, OrderService } from '../../services/storage';
+import { RestaurantService, OrderService, lavAuthorizedFetch } from '../../services/storage';
 import { TemplateRenderer } from '../templates/TemplateRenderer';
 import { generateStandaloneCardHtml } from '../../services/hostingerExport';
 
@@ -94,6 +94,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 const RESTAURANTES_API = '/Restaurantes/api';
   const HOSTINGER_DOMAIN = 'lavdigitalagency.com';
   const [hostingerFolderName, setHostingerFolderName] = useState(HOSTINGER_FOLDER);
+  const [hostingerClientFolder, setHostingerClientFolder] = useState('cliente');
+  const [hostingerPublicationFolder, setHostingerPublicationFolder] = useState('');
+  const [hostingerPublishedMode, setHostingerPublishedMode] = useState<'demo'|'final'>('final');
+  const cleanPublicationFolder = (v: string) => v.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,50);
   const [isPublishingHostinger, setIsPublishingHostinger] = useState(false);
   const [hostingerPublishSuccess, setHostingerPublishSuccess] = useState(false);
   const [hostingerPublishedUrl, setHostingerPublishedUrl] = useState('');
@@ -311,56 +315,56 @@ const RESTAURANTES_API = '/Restaurantes/api';
     setHostingerCardName(form.name);
     setHostingerTemplateName(form.branding?.customTemplateName || activeTemplate?.name || 'Plantilla Personalizada');
     setHostingerFolderName(HOSTINGER_FOLDER);
+    setHostingerClientFolder(form.hostingerConfig?.clientFolder || localStorage.getItem('lav_rest_client_folder') || 'cliente');
+    setHostingerPublicationFolder(form.hostingerConfig?.publicationFolder || cleanPublicationFolder(form.slug));
     setIsHostingerExportModalOpen(true);
     setHostingerPublishSuccess(false);
   };
 
   // Direct Hostinger Publication (without ZIP download)
-  const handlePublishHostinger = async () => {
+  const handlePublishHostinger = async (mode: 'demo' | 'final') => {
+    if (isPublishingHostinger) return;
     setIsPublishingHostinger(true);
     try {
+      const clientFolder = cleanPublicationFolder(hostingerClientFolder);
+      const publicationFolder = cleanPublicationFolder(hostingerPublicationFolder);
+      if(!clientFolder || !publicationFolder) throw new Error('Indica las carpetas de cliente y publicación.');
       const assignedCardName = hostingerCardName.trim() || form.name;
       const assignedTemplateName = hostingerTemplateName.trim() || form.branding?.customTemplateName || 'Plantilla Personalizada';
-      const targetDomain = HOSTINGER_DOMAIN;
-      const publicationSlug = `${assignedCardName}-${assignedTemplateName}`
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '') || form.slug;
-      const liveUrl = `https://${HOSTINGER_DOMAIN}/Restaurantes/${publicationSlug}/`;
-
+      if(mode==='demo' && form.hostingerConfig?.publicationMode==='final' && form.hostingerConfig?.published &&
+         !window.confirm('¿Reemplazar la publicación definitiva por una DEMO en la misma URL?')) return;
+      const publicationPath = clientFolder+'/'+publicationFolder;
+      if(form.hostingerConfig?.published && form.hostingerConfig?.publicationPath &&
+         form.hostingerConfig.publicationPath!==publicationPath &&
+         !window.confirm('Cambiar la carpeta creará una dirección nueva. La anterior no se borrará. ¿Continuar?')) return;
+      const pub = await lavAuthorizedFetch('/Restaurantes/lav-publish.php',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({clientFolder,publicationFolder,mode})
+      });
+      const result = await pub.json();
+      if(!pub.ok || !result.success) throw new Error(result.error || 'No se pudo crear la carpeta real de publicación');
+      const liveUrl = String(result.url);
       const updated: Restaurant = {
-        ...form,
-        name: assignedCardName,
-        branding: {
-          ...form.branding,
-          customTemplateName: assignedTemplateName,
-        },
-        hostingerConfig: {
-          published: true,
-          folder: HOSTINGER_FOLDER,
-          customDomain: HOSTINGER_DOMAIN,
-          publicationSlug,
-          publishedAt: new Date().toISOString(),
-          liveUrl,
-        },
+        ...form, name: assignedCardName,
+        branding:{...form.branding,customTemplateName:assignedTemplateName},
+        hostingerConfig:{
+          published:true,folder:HOSTINGER_FOLDER,customDomain:HOSTINGER_DOMAIN,
+          publicationSlug:publicationFolder,publicationPath,clientFolder,publicationFolder,
+          publicationMode:mode,publishedAt:new Date().toISOString(),liveUrl
+        }
       };
-
-      const saved = await RestaurantService.saveRestaurant(updated);
-      const verifyResponse = await fetch(`${RESTAURANTES_API}/restaurants`, { cache: 'no-store' });
-      if (!verifyResponse.ok) throw new Error('El servidor guardó la tarjeta, pero no fue posible verificar su publicación.');
-      const publishedCards = await verifyResponse.json() as Restaurant[];
-      if (!publishedCards.some((item) => item.id === saved.id && item.hostingerConfig?.publicationSlug === publicationSlug)) throw new Error('La tarjeta no quedó registrada con su enlace público en el servidor.');
-      setForm(saved);
-      onUpdateRestaurant(saved);
-      setHostingerPublishedUrl(liveUrl);
-      setHostingerPublishSuccess(true);
-    } catch (error) {
-      alert(error instanceof Error ? `Error al publicar la tarjeta en Hostinger: ${error.message}` : 'Error al publicar la tarjeta en Hostinger.');
-    } finally {
-      setIsPublishingHostinger(false);
-    }
+      const saved=await RestaurantService.saveRestaurant(updated);
+      const verifyResponse=await fetch(`${RESTAURANTES_API}/restaurants`,{cache:'no-store'});
+      if(!verifyResponse.ok)throw new Error('No se pudo verificar el guardado de la publicación');
+      const publishedCards=await verifyResponse.json() as Restaurant[];
+      if(!publishedCards.some(item=>item.id===saved.id && item.hostingerConfig?.publicationPath===publicationPath &&
+            item.hostingerConfig?.publicationMode===mode)) throw new Error('El servidor no confirmó el modo y la ruta publicada');
+      localStorage.setItem('lav_rest_client_folder',clientFolder);
+      setHostingerPublishedMode(mode);setHostingerFolderName(HOSTINGER_FOLDER+publicationPath+'/');
+      setForm(saved);onUpdateRestaurant(saved);setHostingerPublishedUrl(liveUrl);setHostingerPublishSuccess(true);
+    } catch(error) {
+      alert(error instanceof Error ? 'Error al publicar: '+error.message : 'Error al publicar');
+    } finally {setIsPublishingHostinger(false);}
   };
 
   // Switch Template handler (preserves all menu and contact details)
