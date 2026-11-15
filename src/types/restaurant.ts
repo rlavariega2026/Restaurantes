@@ -200,6 +200,7 @@ export interface Restaurant {
     publicationMode?: 'demo' | 'final';
     clientFolder?: string;
     publicationFolder?: string;
+    publicationPath?: string;
   };
   createdAt: string;
   updatedAt: string;
