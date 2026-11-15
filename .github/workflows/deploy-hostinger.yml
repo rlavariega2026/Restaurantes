@@ -49,7 +49,10 @@ jobs:
             test -s "dist/$name"
             php -l "dist/$name"
           done
-          test -s dist/lav-logo-original.svg
+          # Copy the owner's original full-resolution PNG from the already verified LAV app.
+          curl --retry 4 --retry-delay 3 --fail --silent --show-error --location --max-time 50             "https://lavdigitalmkt.com/bienes-raices-vehiculos/assets/LOGO%20LAV%20DIGITAL.png"             -o "dist/LOGO LAV DIGITAL.png"
+          file "dist/LOGO LAV DIGITAL.png" | grep -q 'PNG image data'
+          test "$(wc -c <'dist/LOGO LAV DIGITAL.png')" -gt 10000
           printf '{"commit":"%s"}\\n' "$GITHUB_SHA" > dist/lav-version.json
 
 
@@ -77,6 +80,6 @@ jobs:
           grep -Fq "$GITHUB_SHA" /tmp/lav-version.json
           curl -fsS https://lavdigitalagency.com/Restaurantes/lav-auth.php?action=status -o /tmp/lav-auth-status.json
           php -r '$v=json_decode(file_get_contents("/tmp/lav-auth-status.json"),true);if(empty($v["success"])||!array_key_exists("authenticated",$v))exit(1);'
-          curl -fsS https://lavdigitalagency.com/Restaurantes/lav-logo-original.svg -o /tmp/lav-real-logo.svg
-          grep -q '<svg' /tmp/lav-real-logo.svg
-          echo "Verified commit, live auth, API and real LAV original image over HTTPS"
+          curl -fsS "https://lavdigitalagency.com/Restaurantes/LOGO%20LAV%20DIGITAL.png?verify=${GITHUB_RUN_ID}" -o /tmp/lav-real-logo.png
+          cmp "dist/LOGO LAV DIGITAL.png" /tmp/lav-real-logo.png
+          echo "Verified commit, live auth, API and exact original LAV PNG over HTTPS"
