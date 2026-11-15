@@ -45,6 +45,12 @@ jobs:
           test -s dist/api.php
           test -s dist/.htaccess
           php -l dist/api.php
+          for name in lav-security.php lav-auth.php lav-publish.php lav-media.php; do
+            test -s "dist/$name"
+            php -l "dist/$name"
+          done
+          test -s dist/lav-logo-original.svg
+          printf '{"commit":"%s"}\\n' "$GITHUB_SHA" > dist/lav-version.json
 
 
       - name: Deploy only dist to the Restaurantes directory
@@ -67,3 +73,10 @@ jobs:
           echo "$API_RESPONSE"
           echo "$API_RESPONSE" | grep -q '"success":true'
           echo "$API_RESPONSE" | grep -q '"storage_writable":true'
+          curl --retry 8 --retry-delay 3 -fsS https://lavdigitalagency.com/Restaurantes/lav-version.json -o /tmp/lav-version.json
+          grep -Fq "$GITHUB_SHA" /tmp/lav-version.json
+          curl -fsS https://lavdigitalagency.com/Restaurantes/lav-auth.php?action=status -o /tmp/lav-auth-status.json
+          php -r '$v=json_decode(file_get_contents("/tmp/lav-auth-status.json"),true);if(empty($v["success"])||!array_key_exists("authenticated",$v))exit(1);'
+          curl -fsS https://lavdigitalagency.com/Restaurantes/lav-logo-original.svg -o /tmp/lav-real-logo.svg
+          grep -q '<svg' /tmp/lav-real-logo.svg
+          echo "Verified commit, live auth, API and real LAV original image over HTTPS"
