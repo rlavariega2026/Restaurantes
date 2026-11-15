@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   Phone,
   MessageCircle,
@@ -64,6 +64,16 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
   cartCount,
   cartTotal,
 }) => {
+  // Fullscreen only on a direct visitor gesture outside interactive controls.
+  const publicSurfaceRef = useRef<HTMLDivElement>(null);
+  const handlePublicSurfaceClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target instanceof Element && event.target.closest(
+      'button,a,input,textarea,select,form,label,video,audio,[role="button"],[contenteditable="true"],[data-no-fullscreen],.gallery-interactive'
+    )) return;
+    const surface = publicSurfaceRef.current;
+    if (!surface || document.fullscreenElement || !document.fullscreenEnabled || !surface.requestFullscreen) return;
+    void surface.requestFullscreen().catch(() => { /* unsupported or declined: leave all actions working */ });
+  };
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string>('all');
@@ -221,7 +231,9 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 
   return (
     <div
-      className={`restaurant-public-page min-h-screen text-slate-900 transition-colors duration-300 pb-24 ${branding.fontBody}`}
+      ref={publicSurfaceRef}
+      onClick={handlePublicSurfaceClick}
+      className={`restaurant-public-page w-full min-h-[100dvh] overflow-x-clip text-slate-900 transition-colors duration-300 pb-24 ${branding.fontBody}`}
       style={{
         backgroundColor: branding.bgColor,
         color: branding.textColor,
