@@ -259,7 +259,7 @@ export default function App() {
       {view === 'card' && (
         <div className="flex-1 bg-slate-900 flex justify-center">
           {/* Mobile Max-width Container for Authentic Phone Experience */}
-          <main className="w-full max-w-md bg-white shadow-2xl min-h-screen">
+          <main className={`w-full bg-white shadow-2xl min-h-[100dvh] ${currentRestaurant.hostingerConfig?.published ? '' : 'max-w-md'}`}>
             <TemplateRenderer
               restaurant={currentRestaurant}
               onOpenProduct={(prod) => setSelectedProduct(prod)}
