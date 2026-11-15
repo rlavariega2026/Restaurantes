@@ -1,0 +1,13 @@
+{
+  "name": "Restaurantes LAV Digital",
+  "short_name": "LAV Restaurantes",
+  "id": "/Restaurantes/",
+  "start_url": "/Restaurantes/",
+  "scope": "/Restaurantes/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#4f46e5",
+  "icons": [
+    { "src": "/Restaurantes/lav-logo-original.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
