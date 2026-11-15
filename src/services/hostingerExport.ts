@@ -70,7 +70,7 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start pb-24">
   <div id="lav-published-surface" class="w-full min-h-[100dvh]">
-  ${isDemo ? '<div class="lav-demo-overlay" aria-label="Versión de demostración LAV Digital MKT"><img src="/Restaurantes/lav-logo-original.svg" alt="LAV Digital"><strong>DEMO</strong><small>Versión de demostración • LAV Digital MKT</small></div>' : ''}
+  ${isDemo ? '<div class="lav-demo-overlay" aria-label="Versión de demostración LAV Digital MKT"><img src="/Restaurantes/LOGO%20LAV%20DIGITAL.png" alt="LAV Digital"><strong>DEMO</strong><small>Versión de demostración • LAV Digital MKT</small></div>' : ''}
 
   <!-- Central Mobile Container -->
   <div class="w-full max-w-md min-h-screen relative shadow-2xl flex flex-col" style="background-color: ${branding.bgColor};">
