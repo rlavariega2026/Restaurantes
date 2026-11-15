@@ -196,8 +196,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-jakarta">
-      {/* GLOBAL PLATFORM MODE SWITCHER BAR */}
-      <div className="bg-slate-950 text-white border-b border-slate-800 px-4 py-2 flex items-center justify-between text-xs sticky top-0 z-50 shadow-md">
+      {/* Keep platform navigation away from anonymous published restaurant pages. */}
+      {(view !== 'card' || authUser) && <div className="bg-slate-950 text-white border-b border-slate-800 px-4 py-2 flex items-center justify-between text-xs sticky top-0 z-50 shadow-md">
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigateTo('landing')}
@@ -259,7 +259,7 @@ export default function App() {
           <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
           <span>Despliegue Hostinger</span>
         </button>
-      </div>
+      </div>}
 
       {/* VIEW 1: COMMERCIAL LANDING PAGE */}
       {view === 'landing' && (
@@ -316,7 +316,7 @@ export default function App() {
       {view === 'card' && (
         <div className="flex-1 bg-slate-900 flex justify-center">
           {/* Mobile Max-width Container for Authentic Phone Experience */}
-          <main className={`w-full bg-white shadow-2xl min-h-[100dvh] ${currentRestaurant.hostingerConfig?.published ? '' : 'max-w-md'}`}>
+          <main className={`w-full bg-white shadow-2xl min-h-[100dvh] ${currentRestaurant.hostingerConfig?.published ? 'max-w-5xl' : 'max-w-md'}`}>
             <TemplateRenderer
               restaurant={currentRestaurant}
               onOpenProduct={(prod) => setSelectedProduct(prod)}
