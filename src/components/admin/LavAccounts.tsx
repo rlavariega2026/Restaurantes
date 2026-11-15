@@ -9,6 +9,8 @@ export function LavAccounts({ onClose }: { onClose: () => void }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [resetFor, setResetFor] = useState('');
+  const [resetPassword, setResetPassword] = useState('');
   const reload = async () => {
     const res = await lavAuthorizedFetch('/Restaurantes/lav-auth.php?action=users');
     const data = await res.json();
@@ -48,12 +50,23 @@ export function LavAccounts({ onClose }: { onClose: () => void }) {
         <div><strong>{a.username}</strong><span className="text-xs text-slate-500 ml-2">{a.name} · {a.role==='superadmin'?'Superadministrador':'Editor'} · {a.active?'Activo':'Suspendido'}</span></div>
         {a.role!=='superadmin' && <div className="flex flex-wrap gap-1">
           <button disabled={busy} className="text-xs border rounded p-2" onClick={()=>{const newName=window.prompt('Nombre del usuario',a.name);if(newName!==null)void action('update',a.username,newName);}}>Editar</button>
-          <button disabled={busy} className="text-xs border rounded p-2" onClick={()=>{const pw=window.prompt('Nueva contraseña (mínimo 12 caracteres)');if(pw)void action('password',a.username,pw);}}>Contraseña</button>
+          <button disabled={busy} className="text-xs border rounded p-2" onClick={()=>{setResetFor(a.username);setResetPassword('');}}>Contraseña</button>
           <button disabled={busy} className="text-xs border rounded p-2" onClick={()=>action(a.active?'suspend':'activate',a.username)}>{a.active?'Suspender':'Activar'}</button>
           <button disabled={busy} className="text-xs border border-red-300 text-red-700 rounded p-2" onClick={()=>{if(window.confirm('¿Eliminar cuenta '+a.username+'?'))void action('delete',a.username);}}>Eliminar</button>
         </div>}
       </div>)}</div>
-      <button className="text-sm underline" onClick={()=>{const pw=window.prompt('Nueva contraseña de lavariega (mínimo 12 caracteres)');if(pw)void action('password','lavariega',pw);}}>Cambiar contraseña de lavariega</button>
+      <button className="text-sm underline" onClick={()=>{setResetFor('lavariega');setResetPassword('');}}>Cambiar contraseña de lavariega</button>
+      {resetFor && <div className="border rounded-xl p-4 space-y-2 bg-slate-50">
+        <h3 className="font-bold">Nueva contraseña para {resetFor}</h3>
+        <input type="password" autoComplete="new-password" value={resetPassword} onChange={e=>setResetPassword(e.target.value)}
+          className="w-full border rounded-lg p-3" placeholder="Mínimo 12 caracteres" aria-label="Nueva contraseña segura" />
+        <div className="flex gap-2">
+          <button className="rounded-lg bg-indigo-700 text-white px-4 py-2 disabled:opacity-50"
+            disabled={busy||resetPassword.length<12}
+            onClick={async()=>{await action('password',resetFor,resetPassword);setResetFor('');setResetPassword('');}}>Guardar contraseña</button>
+          <button className="rounded-lg border px-4 py-2" onClick={()=>{setResetFor('');setResetPassword('');}}>Cancelar</button>
+        </div>
+      </div>}
     </section>
   </div>;
 }
