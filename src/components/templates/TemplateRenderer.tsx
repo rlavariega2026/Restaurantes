@@ -51,6 +51,7 @@ interface TemplateRendererProps {
   onOpenBankTransfer: () => void;
   cartCount: number;
   cartTotal: number;
+  editorPreview?: boolean;
 }
 
 export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
@@ -63,6 +64,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
   onOpenBankTransfer,
   cartCount,
   cartTotal,
+  editorPreview = false,
 }) => {
   // Fullscreen only on a direct visitor gesture outside interactive controls.
   const publicSurfaceRef = useRef<HTMLDivElement>(null);
@@ -70,6 +72,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
     if (event.target instanceof Element && event.target.closest(
       'button,a,input,textarea,select,form,label,video,audio,[role="button"],[contenteditable="true"],[data-no-fullscreen],.gallery-interactive'
     )) return;
+    if (editorPreview) return;
     const surface = publicSurfaceRef.current;
     if (!surface || document.fullscreenElement || !document.fullscreenEnabled || !surface.requestFullscreen) return;
     void surface.requestFullscreen().catch(() => { /* unsupported or declined: leave all actions working */ });
@@ -1129,6 +1132,14 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 
       </footer>
 
+      {/* The watermark is inside the fullscreen element, so it remains visible in native fullscreen. */}
+      {!editorPreview && restaurant.hostingerConfig?.publicationMode === 'demo' && (
+        <div className="lav-public-demo" aria-label="Versión de demostración LAV Digital MKT">
+          <img src="/Restaurantes/LOGO%20LAV%20DIGITAL.png" alt="LAV Digital" onError={(event) => { event.currentTarget.style.visibility = 'hidden'; }} />
+          <strong>DEMO</strong>
+          <span>Versión de demostración • LAV Digital MKT</span>
+        </div>
+      )}
       {/* Lightbox Modal for Gallery Photo Expansion */}
       {selectedGalleryPhoto && (
         <div
