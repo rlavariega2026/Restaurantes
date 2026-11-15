@@ -68,14 +68,16 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 }) => {
   // Fullscreen only on a direct visitor gesture outside interactive controls.
   const publicSurfaceRef = useRef<HTMLDivElement>(null);
+  const [fullscreenNotice, setFullscreenNotice] = useState(false);
   const handlePublicSurfaceClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (event.target instanceof Element && event.target.closest(
       'button,a,input,textarea,select,form,label,video,audio,[role="button"],[contenteditable="true"],[data-no-fullscreen],.gallery-interactive'
     )) return;
     if (editorPreview) return;
     const surface = publicSurfaceRef.current;
-    if (!surface || document.fullscreenElement || !document.fullscreenEnabled || !surface.requestFullscreen) return;
-    void surface.requestFullscreen().catch(() => { /* unsupported or declined: leave all actions working */ });
+    if (!surface || document.fullscreenElement) return;
+    if (!document.fullscreenEnabled || !surface.requestFullscreen) { setFullscreenNotice(true); return; }
+    void surface.requestFullscreen().catch(() => setFullscreenNotice(true));
   };
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -1132,6 +1134,10 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
 
       </footer>
 
+      {fullscreenNotice && !editorPreview && <aside data-no-fullscreen className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[110] w-[min(92vw,430px)] rounded-xl p-3 shadow-xl bg-slate-950/95 text-white flex gap-3 items-start text-xs">
+        <span>Este navegador no permite pantalla completa en esta página. En iPhone puedes usar Compartir → Añadir a pantalla de inicio.</span>
+        <button type="button" onClick={()=>setFullscreenNotice(false)} aria-label="Cerrar aviso" className="font-bold">×</button>
+      </aside>}
       {/* The watermark is inside the fullscreen element, so it remains visible in native fullscreen. */}
       {!editorPreview && restaurant.hostingerConfig?.publicationMode === 'demo' && (
         <div className="lav-public-demo" aria-label="Versión de demostración LAV Digital MKT">
