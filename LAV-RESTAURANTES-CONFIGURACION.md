@@ -11,7 +11,7 @@ Actualizado: 15 de noviembre de 2026.
 - **Carpeta visible en el administrador de archivos Hostinger:** `lavdigitalagency.com/public_html/Restaurantes/`
 - **Ruta interna usada por el workflow FTP:** `/domains/lavdigitalagency.com/public_html/Restaurantes/`
 - **NO CREAR UNA CARPETA `domains` EN EL ADMINISTRADOR DE ARCHIVOS.** La ruta interna no debe confundirse con la visible.
-- FTP suministrado por el propietario: `194.195.84.108`, puerto `21`, usuario `u596885302`. Los valores secretos reales de Actions no son legibles desde el repositorio.
+- El servidor, usuario y contraseña FTP deben permanecer en secretos de GitHub Actions y en el panel privado de Hostinger; no publicarlos dentro del repositorio.
 - Workflow: `.github/workflows/deploy-hostinger.yml`, publica únicamente `dist/`. No cambiar `server-dir` sin corroborar la correspondencia con la URL pública.
 
 ## Datos persistentes — prohibido borrar o sobrescribir
