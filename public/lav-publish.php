@@ -12,6 +12,16 @@ foreach([$client,$publication] as $component){
   if(!preg_match('/^[a-z0-9][a-z0-9_-]{0,49}$/',$component))lav_reply(['error'=>'Nombre de carpeta inválido'],422);
 }
 if(!in_array($mode,['demo','final'],true))lav_reply(['error'=>'Tipo de publicación inválido'],422);
+// Never let a customer publication occupy application service directories or another customer's URL.
+if(in_array($client,['api','admin','assets','public','src','dist','server','data'],true)) lav_reply(['error'=>'Carpeta reservada por la aplicación'],422);
+$restaurantId=(string)($input['restaurantId']??'');
+if($restaurantId==='')lav_reply(['error'=>'Falta el identificador del restaurante'],422);
+$records=lav_store().'/restaurants.json';
+$existing=is_file($records)?json_decode((string)file_get_contents($records),true):[];
+foreach(is_array($existing)?$existing:[] as $record){
+  if(($record['hostingerConfig']['publicationPath']??'')===$client.'/'.$publication && ($record['id']??'')!==$restaurantId)
+    lav_reply(['error'=>'Esta dirección ya pertenece a otro restaurante; elige otra carpeta'],409);
+}
 $dir=__DIR__.'/'.$client.'/'.$publication;
 $parent=__DIR__.'/'.$client;
 if(!is_dir($parent)&&!mkdir($parent,0755,true)&&!is_dir($parent))lav_reply(['error'=>'No se pudo crear carpeta de cliente'],500);
