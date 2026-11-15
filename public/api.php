@@ -9,7 +9,16 @@ function writeData($file,$v){$tmp=$file.'.tmp';return file_put_contents($tmp,jso
 function safeRest($r){if(isset($r['mercadoPagoConfig']))$r['mercadoPagoConfig']['accessToken']='';return $r;}
 function reply($v,$code=200){http_response_code($code);echo json_encode($v,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);exit;}
 $rf=$dir.'/restaurants.json';$of=$dir.'/orders.json';$restaurants=readData($rf);$orders=readData($of);
+require_once __DIR__.'/lav-security.php';
 $method=$_SERVER['REQUEST_METHOD']??'GET';$path=parse_url($_SERVER['REQUEST_URI']??'/',PHP_URL_PATH)?:'/';$path=preg_replace('#^/Restaurantes#i','',$path);$path=rtrim($path,'/')?:'/';$body=json_decode((string)file_get_contents('php://input'),true)?:[];
+// Unauthenticated customers may read only actually published restaurants.
+if($path==='/api/restaurants'&&$method==='GET'&&!lav_current()){
+  reply(array_values(array_map('safeRest',array_filter($restaurants,fn($r)=>!empty($r['hostingerConfig']['published'])))));
+}
+if(($path==='/api/restaurants'&&in_array($method,['POST','PUT'],true))
+   ||(preg_match('#^/api/restaurants/[^/]+$#',$path)&&$method==='DELETE')
+   ||($path==='/api/orders'&&$method==='GET')
+   ||($path==='/api/mercadopago/verify'&&$method==='POST')) lav_require();
 if($path==='/api/health'&&$method==='GET')reply(['success'=>true,'storage_writable'=>is_writable($dir),'api'=>'restaurantes-v2']);
 if($path==='/api/restaurants'&&$method==='GET')reply(array_map('safeRest',$restaurants));
 if($path==='/api/restaurants'&&$method==='POST'){if(empty($body['slug'])||empty($body['name']))reply(['error'=>'Nombre y slug obligatorios'],400);foreach($restaurants as $r)if(($r['slug']??'')===($body['slug']??''))reply(['error'=>'El slug ya existe'],409);$restaurants[]=$body;if(!writeData($rf,$restaurants))reply(['error'=>'No se pudo crear restaurante'],500);reply(safeRest($body),201);}
