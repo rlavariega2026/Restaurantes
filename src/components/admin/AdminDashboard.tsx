@@ -2288,7 +2288,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
 
             {/* Inner Phone Screen Container */}
             <div className="w-full h-full bg-white rounded-[36px] overflow-hidden overflow-y-auto no-scrollbar relative">
-              <TemplateRenderer
+              <TemplateRenderer editorPreview
                 restaurant={form}
                 onOpenProduct={() => {}}
                 onAddToCart={() => {}}
@@ -2736,7 +2736,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
                 <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-xl space-y-3 text-emerald-950">
                   <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                    <span>¡Tarjeta Publicada Exitosamente en Hostinger!</span>
+                    <span>Publicación {hostingerPublishedMode === 'demo' ? 'DEMO' : 'definitiva'} confirmada</span>
                   </div>
                   <p className="text-xs text-emerald-900 leading-relaxed">
                     Tu tarjeta digital ha sido configurada y publicada con el nombre comercial <b>{hostingerCardName}</b> y plantilla <b>{hostingerTemplateName}</b>.
@@ -2769,7 +2769,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
                       <span>Copiar Enlace</span>
                     </button>
                     <button
-                      onClick={() => onViewPublicCard(form.hostingerConfig?.publicationSlug || form.slug)}
+                      onClick={() => window.open(hostingerPublishedUrl, '_blank', 'noopener,noreferrer')}
                       className="flex-1 py-2 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5"
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -2826,9 +2826,18 @@ const RESTAURANTES_API = '/Restaurantes/api';
                       className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg font-mono text-xs font-bold text-slate-700 cursor-not-allowed"
                     />
                     <span className="text-[10px] text-slate-500 mt-0.5 block">
-                      Directorio fijo de instalación. No se modifica al publicar cada restaurante.
+                      Directorio fijo de instalación. Se publicará en las dos carpetas que elijas abajo.
                     </span>
                   </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label className="font-bold text-slate-800">Carpeta del cliente
+                      <input className="block w-full mt-1 px-3 py-2 border rounded-lg font-mono text-xs" value={hostingerClientFolder} onChange={e=>setHostingerClientFolder(e.target.value)} placeholder="nombre-del-cliente" />
+                    </label>
+                    <label className="font-bold text-slate-800">Carpeta de publicación
+                      <input className="block w-full mt-1 px-3 py-2 border rounded-lg font-mono text-xs" value={hostingerPublicationFolder} onChange={e=>setHostingerPublicationFolder(e.target.value)} placeholder="mi-restaurante" />
+                    </label>
+                  </div>
+                  <p className="text-[10px] text-slate-600">Las dos carpetas serán directorios reales dentro de Restaurantes. DEMO y definitiva comparten exactamente la misma dirección.</p>
 
                   {/* 5. Tu Dominio en Hostinger (Opcional) */}
                   <div>
@@ -2847,32 +2856,12 @@ const RESTAURANTES_API = '/Restaurantes/api';
                     </span>
                   </div>
 
-                  {/* Live URL Preview */}
-                  {(() => {
-                    const fileSlug = `${hostingerCardName || form.name}-${hostingerTemplateName || 'plantilla'}`
-                      .toLowerCase()
-                      .normalize('NFD')
-                      .replace(/[\u0300-\u036f]/g, '')
-                      .replace(/[^a-z0-9]+/g, '-')
-                      .replace(/(^-|-$)+/g, '') || form.slug;
-                    const liveUrl = `https://lavdigitalagency.com/Restaurantes/${fileSlug}/`;
-                    return (
-                      <div className="p-3 bg-indigo-50/70 border border-indigo-200 rounded-xl space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-bold text-indigo-950 flex items-center gap-1.5">
-                            <Globe className="w-3.5 h-3.5 text-indigo-600" />
-                            URL donde abrirá tu tarjeta en Hostinger:
-                          </span>
-                          <span className="text-[10px] bg-indigo-200/60 text-indigo-900 px-1.5 py-0.5 rounded font-mono font-semibold">
-                            Enlace Previsto
-                          </span>
-                        </div>
-                        <div className="font-mono text-xs font-bold text-indigo-700 break-all select-all">
-                          {liveUrl}
-                        </div>
-                      </div>
-                    );
-                  })()}
+                  <div className="p-3 bg-indigo-50/70 border border-indigo-200 rounded-xl space-y-1">
+                    <div className="text-[11px] font-bold text-indigo-950">URL pública prevista</div>
+                    <div className="font-mono text-xs font-bold text-indigo-700 break-all select-all">
+                      https://lavdigitalagency.com/Restaurantes/{cleanPublicationFolder(hostingerClientFolder)}/{cleanPublicationFolder(hostingerPublicationFolder)}/
+                    </div>
+                  </div>
                 </>
               )}
             </div>
@@ -2884,16 +2873,16 @@ const RESTAURANTES_API = '/Restaurantes/api';
               >
                 {hostingerPublishSuccess ? 'Cerrar' : 'Cancelar'}
               </button>
-              {!hostingerPublishSuccess && (
-                <button
-                  onClick={handlePublishHostinger}
-                  disabled={isPublishingHostinger}
-                  className="px-4 py-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-lg flex items-center gap-2 shadow-md active:scale-95 transition-all"
-                >
-                  <Globe className="w-3.5 h-3.5 text-amber-300" />
-                  <span>{isPublishingHostinger ? 'Publicando en Hostinger...' : 'Publicar en Hostinger'}</span>
+              {!hostingerPublishSuccess && (<div className="flex flex-wrap gap-2">
+                <button onClick={()=>void handlePublishHostinger('demo')} disabled={isPublishingHostinger}
+                  className="px-4 py-2 bg-violet-800 hover:bg-violet-700 text-white font-bold rounded-lg shadow-md disabled:opacity-60">
+                  {isPublishingHostinger ? 'Publicando...' : 'Publicar DEMO en Hostinger'}
                 </button>
-              )}
+                <button onClick={()=>void handlePublishHostinger('final')} disabled={isPublishingHostinger}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg shadow-md disabled:opacity-60">
+                  {isPublishingHostinger ? 'Publicando...' : 'Publicar definitiva'}
+                </button>
+              </div>)}
             </div>
           </div>
         </div>
