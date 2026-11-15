@@ -275,7 +275,7 @@ export default function App() {
       {view === 'admin' && !authChecking && !authUser && (
         <div className="flex-1 bg-slate-950 min-h-[85dvh] p-4 flex items-center justify-center">
           <form onSubmit={logIn} className="bg-white text-slate-900 rounded-2xl max-w-sm w-full p-7 shadow-2xl space-y-4">
-            <img src="/Restaurantes/lav-logo-original.svg" alt="LAV Digital" className="w-32 h-20 object-contain mx-auto" />
+            <img src="/Restaurantes/LOGO%20LAV%20DIGITAL.png" alt="LAV Digital" className="w-32 h-20 object-contain mx-auto" />
             <h2 className="text-2xl font-black text-center">Restaurantes LAV</h2>
             <p className="text-sm text-slate-600 text-center">Acceso al editor y administración</p>
             {loginError && <p className="text-sm text-red-700 bg-red-50 p-2 rounded-lg">{loginError}</p>}
