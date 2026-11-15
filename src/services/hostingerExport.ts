@@ -279,7 +279,7 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
       if(!surface)return;
       surface.addEventListener('click',function(event){
         const target=event.target;
-        if(target instanceof Element && target.closest('a,button,input,textarea,select,form,label,video,audio,[role="button"],[contenteditable="true"],[data-no-fullscreen]'))return;
+        if(target instanceof Element && target.closest('a,button,img,input,textarea,select,form,label,video,audio,[role="button"],[contenteditable="true"],[data-no-fullscreen]'))return;
         if(!document.fullscreenElement && document.fullscreenEnabled && surface.requestFullscreen){
           surface.requestFullscreen().catch(function(){});
         }
