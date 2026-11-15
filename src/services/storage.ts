@@ -5,6 +5,13 @@ const STORAGE_KEY_RESTAURANTS = 'lav_restaurantes_data_v1';
 const STORAGE_KEY_ORDERS = 'lav_restaurantes_orders_v1';
 const STORAGE_KEY_ACTIVE_SLUG = 'lav_active_restaurant_slug';
 const API_BASE = '/Restaurantes/api';
+export const lavAuthorizedFetch = (input: RequestInfo | URL, init: RequestInit = {}) => {
+  const headers = new Headers(init.headers);
+  const csrf = sessionStorage.getItem('lav_restaurantes_csrf') || '';
+  if (csrf) headers.set('X-LAV-CSRF', csrf);
+  return fetch(input, { ...init, headers, credentials: 'same-origin' });
+};
+
 
 async function apiJson<T>(response: Response): Promise<T> {
   const raw = await response.text();
@@ -73,7 +80,7 @@ export class RestaurantService {
       list.push(updated);
     }
 
-    const response = await fetch(`${API_BASE}/restaurants`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(list) });
+    const response = await lavAuthorizedFetch(`${API_BASE}/restaurants`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(list) });
     const persisted = await apiJson<Restaurant[]>(response);
     if (!Array.isArray(persisted)) throw new Error('El servidor no confirmó el guardado de la tarjeta.');
     // Persistencia confirmada por API; sin copia local de imágenes.
@@ -127,7 +134,7 @@ export class RestaurantService {
       version: 1,
     };
 
-    const response = await fetch(`${API_BASE}/restaurants`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newRestaurant) });
+    const response = await lavAuthorizedFetch(`${API_BASE}/restaurants`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newRestaurant) });
     const persisted = await apiJson<Restaurant>(response);
     const updatedList = [persisted, ...list.filter((item) => item.slug !== finalSlug)];
     // Persistencia confirmada por API; sin copia local de imágenes.
@@ -166,7 +173,7 @@ export class RestaurantService {
       version: 1,
     };
 
-    const response = await fetch(`${API_BASE}/restaurants`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newRestaurant) });
+    const response = await lavAuthorizedFetch(`${API_BASE}/restaurants`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newRestaurant) });
     const persisted = await apiJson<Restaurant>(response);
     // No duplicar el catálogo en localStorage.
     return persisted;
@@ -175,7 +182,7 @@ export class RestaurantService {
   // Delete restaurant
   static async deleteRestaurant(idOrSlug: string): Promise<void> {
     const list = await this.getRestaurants();
-    const response = await fetch(`${API_BASE}/restaurants/${encodeURIComponent(idOrSlug)}`, { method: 'DELETE' });
+    const response = await lavAuthorizedFetch(`${API_BASE}/restaurants/${encodeURIComponent(idOrSlug)}`, { method: 'DELETE' });
     await apiJson<{success:boolean}>(response);
     const filtered = list.filter((r) => r.id !== idOrSlug && r.slug !== idOrSlug);
     // No duplicar el catálogo en localStorage.
