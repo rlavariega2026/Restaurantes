@@ -152,6 +152,8 @@ export class RestaurantService {
 
     const newRestaurant: Restaurant = {
       ...JSON.parse(JSON.stringify(sourceData)),
+      // Guardar como creates an independent unpublished project; never reuse its source URL.
+      hostingerConfig: undefined,
       id: 'rest-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 6),
       slug: finalSlug,
       name: newName.trim() || 'Nuevo Restaurante',
@@ -195,6 +197,7 @@ export class RestaurantService {
 
     const newRestaurant: Restaurant = {
       ...JSON.parse(JSON.stringify(source)),
+      hostingerConfig: undefined,
       id: 'rest-' + Date.now(),
       slug: cleanSlug || `copia-${source.slug}-${Date.now().toString().slice(-4)}`,
       name: newName,
