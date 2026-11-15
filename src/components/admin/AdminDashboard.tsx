@@ -38,7 +38,7 @@ import {
 import JSZip from 'jszip';
 import { Restaurant, MenuItem, MenuCategory, TemplateId, ProductTag, ButtonStyle, GalleryPhoto } from '../../types/restaurant';
 import { TEMPLATE_DEFINITIONS } from '../../data/templateDefinitions';
-import { RestaurantService, OrderService, lavAuthorizedFetch } from '../../services/storage';
+import { RestaurantService, OrderService, lavAuthorizedFetch, uploadRestaurantImage } from '../../services/storage';
 import { TemplateRenderer } from '../templates/TemplateRenderer';
 import { generateStandaloneCardHtml } from '../../services/hostingerExport';
 
@@ -138,7 +138,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       try {
-        const dataUrl = await fileToDataUrl(file);
+        const dataUrl = await uploadRestaurantImage(file);
         setForm((prev) => ({
           ...prev,
           branding: { ...prev.branding, coverUrl: dataUrl },
@@ -156,7 +156,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
       try {
         const newPhotos: GalleryPhoto[] = await Promise.all(
           files.map(async (file, idx) => {
-            const dataUrl = await fileToDataUrl(file);
+            const dataUrl = await uploadRestaurantImage(file);
             return {
               id: 'gal-' + Date.now().toString(36) + '-' + idx,
               url: dataUrl,
@@ -183,7 +183,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       try {
-        const dataUrl = await fileToDataUrl(file);
+        const dataUrl = await uploadRestaurantImage(file);
         if (editingProduct) {
           setEditingProduct({ ...editingProduct, imageUrl: dataUrl });
         }
