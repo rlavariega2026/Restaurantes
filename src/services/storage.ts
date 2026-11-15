@@ -66,15 +66,17 @@ export class RestaurantService {
       const res = await fetch(`${API_BASE}/restaurants`);
       if (res.ok) {
         const data = await apiJson<Restaurant[]>(res);
-        if (Array.isArray(data) && data.length > 0) {
-          // El servidor es la fuente de verdad; no duplicar fotografías en localStorage.
-          return data;
+        if (Array.isArray(data)) {
+          // Anonymous sessions receive only server-authorized public cards; no stale local drafts.
+          return data.length > 0 ? data : INITIAL_RESTAURANTS;
         }
       }
     } catch {
       // Backend not reached or offline, fallback to localStorage
     }
 
+    // Never expose a previous editor's local drafts to an anonymous visitor.
+    if (!sessionStorage.getItem('lav_restaurantes_csrf')) return INITIAL_RESTAURANTS;
     const local = localStorage.getItem(STORAGE_KEY_RESTAURANTS);
     if (local) {
       try {
