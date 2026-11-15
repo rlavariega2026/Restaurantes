@@ -2,6 +2,7 @@ import { Restaurant } from '../types/restaurant';
 
 export function generateStandaloneCardHtml(restaurant: Restaurant): string {
   const { branding, contact, socialLinks, features, schedule, categories, products, bankDetails } = restaurant;
+  const isDemo = restaurant.hostingerConfig?.publicationMode === 'demo';
 
   const serializedData = JSON.stringify(restaurant).replace(/</g, '\\u003c');
   const orderSettings = restaurant.ordering || { enabled: true, destination: 'whatsapp', buttonLabel: 'Agregar al pedido' };
@@ -44,6 +45,12 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
       padding: 0;
       -webkit-font-smoothing: antialiased;
     }
+    html, body { width:100%; min-height:100dvh; overflow-x:clip; }
+    #lav-published-surface:fullscreen { width:100%; min-height:100dvh; overflow-y:auto; }
+    .lav-demo-overlay{position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;justify-content:center;align-items:center;pointer-events:none;gap:12px;}
+    .lav-demo-overlay img{width:min(48vw,310px);max-height:160px;object-fit:contain;opacity:.24;}
+    .lav-demo-overlay strong{font-size:clamp(75px,22vw,225px);font-weight:950;line-height:1;letter-spacing:-.06em;transform:rotate(-16deg);background:linear-gradient(110deg,#78c7ff,#7e77f2,#963af6);background-clip:text;-webkit-background-clip:text;color:transparent;opacity:.24;}
+    .lav-demo-overlay small{position:absolute;bottom:max(15px,env(safe-area-inset-bottom,0px));padding:8px 14px;background:#302455b8;color:#fff;border-radius:18px;font-weight:700;max-width:90vw;text-align:center}
     .font-serif-luxury { font-family: 'Playfair Display', serif; }
     .font-cinzel { font-family: 'Cinzel', serif; }
     .font-oswald { font-family: 'Oswald', sans-serif; }
@@ -62,6 +69,8 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
   </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start pb-24">
+  <div id="lav-published-surface" class="w-full min-h-[100dvh]">
+  ${isDemo ? '<div class="lav-demo-overlay" aria-label="Versión de demostración LAV Digital MKT"><img src="/Restaurantes/LOGO%20LAV%20DIGITAL.png" alt="LAV Digital"><strong>DEMO</strong><small>Versión de demostración • LAV Digital MKT</small></div>' : ''}
 
   <!-- Central Mobile Container -->
   <div class="w-full max-w-md min-h-screen relative shadow-2xl flex flex-col" style="background-color: ${branding.bgColor};">
@@ -262,7 +271,20 @@ export function generateStandaloneCardHtml(restaurant: Restaurant): string {
 
   </div>
 
+  </div>
   <script>
+    // Fullscreen must be initiated by an unmodified visitor click.
+    (function(){
+      const surface=document.getElementById('lav-published-surface');
+      if(!surface)return;
+      surface.addEventListener('click',function(event){
+        const target=event.target;
+        if(target instanceof Element && target.closest('a,button,input,textarea,select,form,label,video,audio,[role="button"],[contenteditable="true"],[data-no-fullscreen]'))return;
+        if(!document.fullscreenElement && document.fullscreenEnabled && surface.requestFullscreen){
+          surface.requestFullscreen().catch(function(){});
+        }
+      });
+    })();
     // Copy data helper with visual feedback
     function copyData(text, btn) {
       navigator.clipboard.writeText(text).then(() => {
