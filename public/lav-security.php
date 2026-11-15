@@ -25,7 +25,7 @@ function lav_session(): void {
   if(session_status()===PHP_SESSION_ACTIVE) return;
   ini_set('session.use_strict_mode','1');
   session_name('LAV_RESTAURANTES');
-  session_set_cookie_params(['lifetime'=>0,'path'=>'/Restaurantes/','secure'=>!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off','httponly'=>true,'samesite'=>'Strict']);
+  session_set_cookie_params(['lifetime'=>0,'path'=>'/Restaurantes/','secure'=>true,'httponly'=>true,'samesite'=>'Strict']);
   session_start();
 }
 function lav_current(): ?array {
@@ -56,10 +56,20 @@ function lav_auth_run(): void {
   }
   if($method==='POST' && $action==='login'){
     $name=(string)($input['username']??'');$password=(string)($input['password']??'');
+    $key=hash('sha256',(string)($_SERVER['REMOTE_ADDR']??'unknown').'|'.$name);
+    $limitFile=lav_store().'/lav-login-attempts.json';
+    $attempts=is_file($limitFile)?json_decode((string)file_get_contents($limitFile),true):[];
+    if(!is_array($attempts))$attempts=[];
+    $record=$attempts[$key]??['count'=>0,'since'=>time()];
+    if(time()-(int)$record['since']>900)$record=['count'=>0,'since'=>time()];
+    if((int)$record['count']>=8)lav_reply(['error'=>'Demasiados intentos. Inténtalo de nuevo en 15 minutos'],429);
     $users=lav_users();$user=$users[$name]??null;
     if(!$user||empty($user['active'])||!password_verify($password,(string)($user['password_hash']??''))) {
+      $attempts[$key]=['count'=>(int)$record['count']+1,'since'=>(int)$record['since']];
+      file_put_contents($limitFile,json_encode($attempts),LOCK_EX);
       usleep(350000); lav_reply(['error'=>'Usuario o contraseña incorrectos'],401);
     }
+    unset($attempts[$key]);file_put_contents($limitFile,json_encode($attempts),LOCK_EX);
     session_regenerate_id(true); $_SESSION['lav_user']=$name;$_SESSION['lav_version']=(int)($user['version']??1);
     $_SESSION['lav_active']=time();$_SESSION['lav_csrf']=bin2hex(random_bytes(24));
     lav_reply(['success'=>true,'user'=>lav_current(),'csrf'=>$_SESSION['lav_csrf']]);
