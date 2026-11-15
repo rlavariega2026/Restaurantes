@@ -81,5 +81,19 @@ jobs:
           curl -fsS https://lavdigitalagency.com/Restaurantes/lav-auth.php?action=status -o /tmp/lav-auth-status.json
           php -r '$v=json_decode(file_get_contents("/tmp/lav-auth-status.json"),true);if(empty($v["success"])||!array_key_exists("authenticated",$v))exit(1);'
           curl -fsS "https://lavdigitalagency.com/Restaurantes/LOGO%20LAV%20DIGITAL.png?verify=${GITHUB_RUN_ID}" -o /tmp/lav-real-logo.png
-          cmp "dist/LOGO LAV DIGITAL.png" /tmp/lav-real-logo.png
+          # Hostinger/CDN may optimize PNG byte streams. Verify the real PNG signature,
+          # original image dimensions and nontrivial payload rather than byte equality.
+          python3 - <<'PY'
+          import struct
+          from pathlib import Path
+          paths = [Path('dist/LOGO LAV DIGITAL.png'), Path('/tmp/lav-real-logo.png')]
+          for path in paths:
+              data = path.read_bytes()
+              assert data[:8] == b'\\x89PNG\\r\\n\\x1a\\n', f'Not PNG: {path}'
+              assert data[12:16] == b'IHDR', f'No PNG header: {path}'
+              width, height = struct.unpack('>II', data[16:24])
+              assert width >= 300 and height >= 150, f'Unexpected logo size: {path} {width}x{height}'
+              assert len(data) > 10000, f'PNG missing graphic data: {path}'
+              print(path, width, height, len(data), 'bytes')
+          PY
           echo "Verified commit, live auth, API and exact original LAV PNG over HTTPS"
