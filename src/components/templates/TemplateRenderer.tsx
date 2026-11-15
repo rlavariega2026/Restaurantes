@@ -71,7 +71,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
   const [fullscreenNotice, setFullscreenNotice] = useState(false);
   const handlePublicSurfaceClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (event.target instanceof Element && event.target.closest(
-      'button,a,input,textarea,select,form,label,video,audio,[role="button"],[contenteditable="true"],[data-no-fullscreen],.gallery-interactive'
+      'button,a,img,input,textarea,select,form,label,video,audio,[role="button"],[contenteditable="true"],[data-no-fullscreen],.gallery-interactive'
     )) return;
     if (editorPreview) return;
     const surface = publicSurfaceRef.current;
