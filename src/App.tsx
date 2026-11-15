@@ -86,11 +86,12 @@ export default function App() {
       if (segments[0]?.toLowerCase() === 'admin') {
         setView('admin');
       } else {
-        const requestedSlug = segments[0]?.toLowerCase() === 'restaurantes' ? segments[1] : segments[0];
+        const requestedSlug = segments.join('/');
         if (requestedSlug) {
           const found = data.find((r) =>
             r.slug === requestedSlug ||
-            r.hostingerConfig?.publicationSlug === requestedSlug
+            r.hostingerConfig?.publicationSlug === requestedSlug ||
+              r.hostingerConfig?.publicationPath === requestedSlug
           );
           if (found) {
             setCurrentRestaurant(found);
@@ -124,7 +125,7 @@ export default function App() {
     const appBase = '/Restaurantes';
     if (newView === 'card' && slug) {
       const rest = restaurants.find((r) => r.slug === slug || r.hostingerConfig?.publicationSlug === slug);
-      const publicSlug = rest?.hostingerConfig?.publicationSlug || rest?.slug || slug;
+      const publicSlug = rest?.hostingerConfig?.publicationPath || rest?.hostingerConfig?.publicationSlug || rest?.slug || slug;
       window.history.pushState({}, '', `${appBase}/${publicSlug}/`);
       if (rest) RestaurantService.recordEvent(rest.slug, 'views');
     } else if (newView === 'admin') {
