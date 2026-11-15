@@ -1150,6 +1150,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
       {selectedGalleryPhoto && (
         <div
           className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
+          data-no-fullscreen
           onClick={() => setSelectedGalleryPhoto(null)}
         >
           <img
