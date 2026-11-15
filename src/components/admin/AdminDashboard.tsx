@@ -205,7 +205,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
       // The API intentionally never returns the private token. Preserve the value typed in this editor.
       setForm({ ...saved, mercadoPagoConfig: { ...saved.mercadoPagoConfig, accessToken: form.mercadoPagoConfig.accessToken } });
       onUpdateRestaurant(saved);
-      const response = await fetch(`${RESTAURANTES_API}/mercadopago/verify`, {
+      const response = await lavAuthorizedFetch(`${RESTAURANTES_API}/mercadopago/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ restaurant_slug: saved.slug }),
