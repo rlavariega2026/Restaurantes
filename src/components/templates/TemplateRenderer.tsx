@@ -1141,7 +1141,7 @@ export const TemplateRenderer: React.FC<TemplateRendererProps> = ({
       {/* The watermark is inside the fullscreen element, so it remains visible in native fullscreen. */}
       {!editorPreview && restaurant.hostingerConfig?.publicationMode === 'demo' && (
         <div className="lav-public-demo" aria-label="Versión de demostración LAV Digital MKT">
-          <img src="/Restaurantes/lav-logo-original.svg" alt="LAV Digital" onError={(event) => { event.currentTarget.style.visibility = 'hidden'; }} />
+          <img src="/Restaurantes/LOGO%20LAV%20DIGITAL.png" alt="LAV Digital" onError={(event) => { event.currentTarget.style.visibility = 'hidden'; }} />
           <strong>DEMO</strong>
           <span>Versión de demostración • LAV Digital MKT</span>
         </div>
