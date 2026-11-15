@@ -197,6 +197,9 @@ export interface Restaurant {
     publishedAt?: string;
     liveUrl?: string;
     publicationSlug?: string;
+    publicationMode?: 'demo' | 'final';
+    clientFolder?: string;
+    publicationFolder?: string;
   };
   createdAt: string;
   updatedAt: string;
