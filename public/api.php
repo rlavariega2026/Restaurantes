@@ -18,6 +18,7 @@ if($path==='/api/restaurants'&&$method==='GET'&&!lav_current()){
 if(($path==='/api/restaurants'&&in_array($method,['POST','PUT'],true))
    ||(preg_match('#^/api/restaurants/[^/]+$#',$path)&&$method==='DELETE')
    ||($path==='/api/orders'&&$method==='GET')
+   ||(preg_match('#^/api/orders/[^/]+$#',$path)&&$method==='PATCH')
    ||($path==='/api/mercadopago/verify'&&$method==='POST')) lav_require();
 if($path==='/api/health'&&$method==='GET')reply(['success'=>true,'storage_writable'=>is_writable($dir),'api'=>'restaurantes-v2']);
 if($path==='/api/restaurants'&&$method==='GET')reply(array_map('safeRest',$restaurants));
