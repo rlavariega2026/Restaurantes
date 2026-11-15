@@ -339,7 +339,7 @@ const RESTAURANTES_API = '/Restaurantes/api';
          !window.confirm('Cambiar la carpeta creará una dirección nueva. La anterior no se borrará. ¿Continuar?')) return;
       const pub = await lavAuthorizedFetch('/Restaurantes/lav-publish.php',{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({clientFolder,publicationFolder,mode})
+        body:JSON.stringify({clientFolder,publicationFolder,mode,restaurantId:form.id})
       });
       const result = await pub.json();
       if(!pub.ok || !result.success) throw new Error(result.error || 'No se pudo crear la carpeta real de publicación');
