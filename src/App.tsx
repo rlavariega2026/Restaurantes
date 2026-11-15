@@ -3,6 +3,7 @@ import { Restaurant, MenuItem, CartItem } from './types/restaurant';
 import { RestaurantService } from './services/storage';
 import { LavLandingPage } from './components/landing/LavLandingPage';
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { LavAccounts } from './components/admin/LavAccounts';
 import { TemplateRenderer } from './components/templates/TemplateRenderer';
 import { CartDrawer } from './components/common/CartDrawer';
 import { ProductDetailModal } from './components/common/ProductDetailModal';
@@ -14,6 +15,43 @@ import { HostingerDeployGuideModal } from './components/common/HostingerDeployGu
 import { Sliders, Globe, Smartphone, HelpCircle, ArrowLeft } from 'lucide-react';
 
 export default function App() {
+  const [authUser, setAuthUser] = useState<{ username: string; role: string } | null>(null);
+  const [authChecking, setAuthChecking] = useState(true);
+  const [loginUsername, setLoginUsername] = useState('lavariega');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [loginBusy, setLoginBusy] = useState(false);
+  const [accountsOpen, setAccountsOpen] = useState(false);
+  useEffect(() => {
+    fetch('/Restaurantes/lav-auth.php?action=status', { credentials: 'same-origin', cache: 'no-store' })
+      .then(r => r.json()).then(data => {
+        if(data.authenticated && data.user){
+          setAuthUser(data.user);
+          if(data.csrf) sessionStorage.setItem('lav_restaurantes_csrf', data.csrf);
+        }
+      }).catch(()=>{}).finally(()=>setAuthChecking(false));
+  }, []);
+  const logIn = async (event: React.FormEvent) => {
+    event.preventDefault(); setLoginBusy(true); setLoginError('');
+    try {
+      const response=await fetch('/Restaurantes/lav-auth.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',username:loginUsername,password:loginPassword})});
+      const data=await response.json();
+      if(!response.ok || !data.success)throw new Error(data.error||'No se pudo ingresar');
+      sessionStorage.setItem('lav_restaurantes_csrf',data.csrf);
+      setAuthUser(data.user);setLoginPassword('');
+      const updated=await RestaurantService.getRestaurants();
+      setRestaurants(updated);
+      const active=updated.find(r=>r.slug===RestaurantService.getActiveSlug())||updated[0];
+      if(active)setCurrentRestaurant(active);
+    } catch(e) {setLoginError(e instanceof Error?e.message:'Error de acceso');}
+    finally {setLoginBusy(false);}
+  };
+  const logOut = async () => {
+    await fetch('/Restaurantes/lav-auth.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logout'})}).catch(()=>{});
+    setAuthUser(null);setAccountsOpen(false);sessionStorage.removeItem('lav_restaurantes_csrf');
+    navigateTo('landing');
+  };
+
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [currentRestaurant, setCurrentRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
@@ -208,6 +246,10 @@ export default function App() {
           </button>
         </div>
 
+        {authUser && <div className="flex gap-2 items-center text-xs">
+          {authUser.role==='superadmin' && <button className="rounded-lg bg-violet-700 px-2 py-1.5 text-white" onClick={()=>setAccountsOpen(true)}>Administración de usuarios</button>}
+          <button className="rounded-lg border border-slate-600 px-2 py-1.5" onClick={()=>void logOut()}>Cerrar sesión</button>
+        </div>}
         {/* Hostinger Guide Trigger */}
         <button
           onClick={() => setIsHostingerGuideOpen(true)}
@@ -229,7 +271,21 @@ export default function App() {
       )}
 
       {/* VIEW 2: ADMIN DASHBOARD */}
-      {view === 'admin' && (
+      {view === 'admin' && !authChecking && !authUser && (
+        <div className="flex-1 bg-slate-950 min-h-[85dvh] p-4 flex items-center justify-center">
+          <form onSubmit={logIn} className="bg-white text-slate-900 rounded-2xl max-w-sm w-full p-7 shadow-2xl space-y-4">
+            <img src="/Restaurantes/LOGO%20LAV%20DIGITAL.png" alt="LAV Digital" className="w-32 h-20 object-contain mx-auto" />
+            <h2 className="text-2xl font-black text-center">Restaurantes LAV</h2>
+            <p className="text-sm text-slate-600 text-center">Acceso al editor y administración</p>
+            {loginError && <p className="text-sm text-red-700 bg-red-50 p-2 rounded-lg">{loginError}</p>}
+            <label className="block text-sm font-bold">Usuario<input className="w-full border rounded-lg p-3 mt-1" autoComplete="username" value={loginUsername} onChange={e=>setLoginUsername(e.target.value)} required /></label>
+            <label className="block text-sm font-bold">Contraseña<input className="w-full border rounded-lg p-3 mt-1" type="password" autoComplete="current-password" value={loginPassword} onChange={e=>setLoginPassword(e.target.value)} required /></label>
+            <button className="w-full rounded-lg p-3 bg-indigo-700 text-white font-bold disabled:opacity-50" disabled={loginBusy}>{loginBusy?'Validando...':'Iniciar sesión'}</button>
+          </form>
+        </div>
+      )}
+      {view === 'admin' && authChecking && <div className="p-8 text-center">Comprobando acceso...</div>}
+      {view === 'admin' && authUser && (
         <AdminDashboard
           restaurants={restaurants}
           currentRestaurant={currentRestaurant}
@@ -278,6 +334,7 @@ export default function App() {
         </div>
       )}
 
+      {accountsOpen && authUser?.role==='superadmin' && <LavAccounts onClose={()=>setAccountsOpen(false)} />}
       {/* MODALS */}
       {/* Cart Drawer */}
       <CartDrawer
